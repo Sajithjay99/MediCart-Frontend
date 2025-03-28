@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -10,7 +11,17 @@ function ProductCard({ product }) {
   };
 
   const handleAddToCart = () => {
-    navigate('/cart');
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existing = cart.find(item => item._id === product._id);
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    toast.success(`${product.name} added to cart!`);
   };
 
   const image1 = product.images?.[0];
@@ -18,14 +29,17 @@ function ProductCard({ product }) {
 
   return (
     <div
-      className="w-[300px] h-[400px] bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 m-3 flex flex-col justify-between"
+      className="w-[300px] h-[420px] bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 m-3 flex flex-col justify-between"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Flip container */}
-      <div className="relative w-full h-48 bg-gray-100 cursor-pointer perspective" style={{ perspective: '1000px' }}>
+      {/* Flip image area */}
+      <div
+        className="relative w-full h-48 bg-gray-100 cursor-pointer"
+        style={{ perspective: '1000px' }}
+      >
         <div
-          className={`w-full h-full transition-transform duration-1000 transform-style-preserve-3d ${
+          className={`w-full h-full transition-transform duration-1000 ${
             hovered ? 'rotate-y-180' : ''
           }`}
           style={{
@@ -36,24 +50,22 @@ function ProductCard({ product }) {
             transition: 'transform 1s',
           }}
         >
-          {/* Front Image */}
+          {/* Front */}
           {image1 && (
             <img
               src={image1}
               alt={product.name}
-              className="absolute inset-0 w-full h-full object-cover backface-hidden"
-              style={{
-                backfaceVisibility: 'hidden',
-              }}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ backfaceVisibility: 'hidden' }}
             />
           )}
 
-          {/* Back Image (rotated 180deg) */}
+          {/* Back */}
           {image2 && (
             <img
               src={image2}
               alt={`${product.name} alt`}
-              className="absolute inset-0 w-full h-full object-cover backface-hidden"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{
                 transform: 'rotateY(180deg)',
                 backfaceVisibility: 'hidden',
@@ -93,7 +105,12 @@ function ProductCard({ product }) {
           </button>
           <button
             onClick={handleAddToCart}
-            className="w-1/2 py-2 text-sm bg-red-400 text-white rounded hover:bg-red-700 transition"
+            disabled={!product.availability}
+            className={`w-1/2 py-2 text-sm text-white rounded transition ${
+              product.availability
+                ? 'bg-red-400 hover:bg-red-600'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
           >
             Add to Cart
           </button>

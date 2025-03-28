@@ -3,6 +3,8 @@ import React from 'react'
   import { Routes, Route } from 'react-router-dom'
 import ProductsCustomer from './Shop/ProductsCustomer'
 import Customerlogin from '../Customer Login/customerlogin'
+import ProductOverview from './Shop/ProductOverview'
+import ProductCart from './Shop/ProductCart'
 
 function CustomerDashboard() {
   return (
@@ -22,7 +24,10 @@ function CustomerDashboard() {
   <Route path="/reviews" element={<h1>Review page</h1>} />
   <Route path="/about" element={<h1>About page</h1>} />
   <Route path="/contactus" element={<h1>Contact page</h1>} />
-  
+  <Route path="/products/:id" element={<ProductOverview />} />
+  <Route path="/cart" element={<ProductCart />} />
+
+
 </Routes>
 
 
