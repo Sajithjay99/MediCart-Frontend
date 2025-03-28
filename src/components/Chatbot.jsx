@@ -6,7 +6,6 @@ import chatbotIcon from "../../src/assets/assistant.png";
 import {
   FaTimes,
   FaPaperPlane,
-  FaUser,
   FaCapsules,
   FaHeartbeat,
   FaCommentMedical,
@@ -122,7 +121,7 @@ const Chatbot = () => {
       >
         <div className="flex flex-col h-full overflow-hidden bg-white border border-gray-200 shadow-xl rounded-t-3xl">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 text-white bg-gradient-to-r from-teal-700 to-emerald-600">
+          <div className="flex items-center justify-between px-5 py-4 text-white bg-gradient-to-r from-blue-600 to-blue-500">
             <div className="flex items-center gap-3">
               <img
                 src={assistantAvatar}
@@ -149,7 +148,7 @@ const Chatbot = () => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 text-sm font-medium text-center shadow-md bg-emerald-100 text-emerald-900 rounded-xl"
+                className="p-4 text-sm font-medium text-center shadow-md bg-blue-100 text-blue-900 rounded-xl"
               >
                 👋 Welcome to <strong>chatBot</strong> <br />
                 Ask about medication, symptoms, or prescriptions.
@@ -160,19 +159,19 @@ const Chatbot = () => {
               <div className="flex flex-col gap-2 pt-2">
                 <button
                   onClick={() => handleQuickAction("Order Prescription")}
-                  className="flex items-center gap-2 px-4 py-2 text-sm transition bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-emerald-100"
+                  className="flex items-center gap-2 px-4 py-2 text-sm transition bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-blue-100"
                 >
                   <FaCapsules /> Order Prescription
                 </button>
                 <button
                   onClick={() => handleQuickAction("Drug Availability")}
-                  className="flex items-center gap-2 px-4 py-2 text-sm transition bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-emerald-100"
+                  className="flex items-center gap-2 px-4 py-2 text-sm transition bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-blue-100"
                 >
                   <FaHeartbeat /> Drug Availability
                 </button>
                 <button
                   onClick={() => handleQuickAction("Talk to a Pharmacist")}
-                  className="flex items-center gap-2 px-4 py-2 text-sm transition bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-emerald-100"
+                  className="flex items-center gap-2 px-4 py-2 text-sm transition bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-blue-100"
                 >
                   <FaCommentMedical /> Talk to a Pharmacist
                 </button>
@@ -190,7 +189,7 @@ const Chatbot = () => {
                   className={`p-3 rounded-2xl max-w-[75%] text-sm shadow ${
                     msg.fromUser
                       ? "bg-gray-200 text-gray-900"
-                      : "bg-gradient-to-tr from-emerald-600 to-teal-500 text-white"
+                      : "bg-gradient-to-tr from-blue-600 to-blue-500 text-white"
                   }`}
                 >
                   <p>{msg.text}</p>
@@ -203,7 +202,7 @@ const Chatbot = () => {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="px-4 py-2 text-sm text-white rounded-lg shadow bg-emerald-300 animate-pulse">
+                <div className="px-4 py-2 text-sm text-white rounded-lg shadow bg-blue-400 animate-pulse">
                   Typing...
                 </div>
               </div>
@@ -217,11 +216,11 @@ const Chatbot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="flex-1 px-4 py-2 text-sm bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              className="flex-1 px-4 py-2 text-sm bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
             <button
               onClick={handleSend}
-              className="p-3 text-white rounded-full shadow bg-emerald-600 hover:bg-emerald-700"
+              className="p-3 text-white rounded-full shadow bg-blue-600 hover:bg-blue-700"
             >
               <FaPaperPlane />
             </button>

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaShoppingCart } from "react-icons/fa";
 import { jwtDecode } from 'jwt-decode';
+import toast from 'react-hot-toast';
 
 function Header() {
   const navigate = useNavigate();
@@ -35,8 +36,10 @@ function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+   
     navigate('/');
     window.location.reload();
+    toast.success("Logged out successfully");
   };
 
   return (
