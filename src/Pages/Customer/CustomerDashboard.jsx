@@ -5,6 +5,7 @@ import ProductsCustomer from './Shop/ProductsCustomer'
 import Customerlogin from '../Customer Login/customerlogin'
 import ProductOverview from './Shop/ProductOverview'
 import ProductCart from './Shop/ProductCart'
+import HomePage from './Home/HomePage'
 
 function CustomerDashboard() {
   return (
@@ -18,7 +19,7 @@ function CustomerDashboard() {
 </div>
 
 <Routes>
-  <Route path="/" element={<h1>Home page</h1>} />
+  <Route path="/" element={<HomePage/>} />
   <Route path="/shop" element={<ProductsCustomer/>} />
   <Route path="/medicine" element={<h1>Medicine page</h1>} />
   <Route path="/reviews" element={<h1>Review page</h1>} />
