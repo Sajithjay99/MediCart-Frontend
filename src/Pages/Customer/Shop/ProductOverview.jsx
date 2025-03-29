@@ -78,7 +78,9 @@ function ProductOverview() {
                     alt={`thumb-${idx}`}
                     onClick={() => setSelectedImage(img)}
                     className={`w-14 h-14 object-cover border rounded cursor-pointer transition-all ${
-                      selectedImage === img ? 'ring-2 ring-blue-500' : 'hover:ring hover:ring-blue-300'
+                      selectedImage === img
+                        ? 'ring-2 ring-blue-500'
+                        : 'hover:ring hover:ring-blue-300'
                     }`}
                   />
                 ))}
@@ -88,35 +90,36 @@ function ProductOverview() {
 
           {/* Right - Product Info */}
           <div className="space-y-3">
-            <h1 className="text-2xl font-bold text-blue-700">{product.name}</h1>
-            <p className="text-sm text-gray-500">{product.category}</p>
+            <h1 className="text-2xl font-bold text-gray-800 capitalize">{product.name}</h1>
+            <p className="text-sm text-blue-500 font-medium">{product.category}</p>
+
             {product.brand && (
-              <p className="text-sm text-gray-600">
-                <strong>Brand:</strong> {product.brand}
+              <p className="text-sm text-gray-500">
+                <span className="font-medium text-gray-600">Brand:</span> {product.brand}
               </p>
             )}
+
             <div className="text-lg font-semibold text-green-600 mt-2">
-              ₹{product.price}
+              Rs.{product.price}
             </div>
+
             <div className="text-sm text-gray-700">
-              <strong>Availability:</strong>{' '}
+              <span className="font-medium">Availability:</span>{' '}
               <span
                 className={`ml-1 px-2 py-1 rounded text-xs font-medium ${
-                  product.availability ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
+                  product.availability
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-600'
                 }`}
               >
                 {product.availability ? 'In Stock' : 'Out of Stock'}
               </span>
             </div>
-            <div className="text-sm text-gray-600">
-              <strong>Expiry Date:</strong>{' '}
-              {product.expiryDate
-                ? new Date(product.expiryDate).toLocaleDateString()
-                : 'N/A'}
-            </div>
 
             {product.description && (
-              <p className="text-sm text-gray-600 pt-2">{product.description}</p>
+              <p className="text-sm text-gray-600 pt-2 leading-relaxed">
+                {product.description}
+              </p>
             )}
 
             {/* Quantity & Add to Cart */}
@@ -127,7 +130,7 @@ function ProductOverview() {
                 min={1}
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-16 px-2 py-1 border rounded text-sm text-center"
+                className="w-16 px-2 py-1 border rounded text-sm text-center focus:outline-blue-500"
               />
               <button
                 onClick={handleAddToCart}

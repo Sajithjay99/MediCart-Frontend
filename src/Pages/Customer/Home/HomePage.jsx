@@ -96,8 +96,7 @@ function HomePage() {
 </div>
 
 
-
-     {/* ✅ Featured Products */}
+{/* ✅ Featured Products */}
 <div className="max-w-7xl mx-auto px-6 pt-12">
   <h2 className="text-4xl font-bold text-center text-blue-500/90 mb-5">
     Featured Products
@@ -128,47 +127,62 @@ function HomePage() {
             <h3 className="font-semibold text-base truncate mt-3 text-blue-800">
               {product.name}
             </h3>
+
             <p className="text-xs text-gray-500">{product.category}</p>
-            <p className="text-xs text-gray-400 mb-1 line-clamp-2">{product.description}</p>
 
-            <div className="text-green-600 font-semibold text-sm mb-1">
-              Rs. {product.price}
+            {product.brand && (
+              <p className="text-xs italic text-gray-400">Brand: {product.brand}</p>
+            )}
+
+            <p className="text-xs text-gray-400 mb-1 line-clamp-2">
+              {product.description}
+            </p>
+
+            {/* Price & Availability aligned in row */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-blue-600 font-semibold text-sm">
+                Rs.{product.price}
+              </div>
+              <span
+                className={`text-xs px-2 py-1 rounded-full ${
+                  product.availability
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-600'
+                }`}
+              >
+                {product.availability ? 'In Stock' : 'Out of Stock'}
+              </span>
             </div>
 
-            <span className={`text-xs px-2 py-1 rounded-full w-fit mb-1 ${product.availability ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-              {product.availability ? 'In Stock' : 'Out of Stock'}
-            </span>
-
-            <div className="text-xs text-gray-500 mb-2">
-              Expiry: {product.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : 'N/A'}
-            </div>
-
-           {/* Buttons */}
-<div className="mt-auto flex gap-2">
-  <Link
-    to={`/products/${product._id}`}
-    className="flex-1 bg-black hover:bg-blue-500/90 text-white text-sm py-1 rounded text-center transition"
-  >
-    View
-  </Link>
-  <button
-    onClick={() => {
-      const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
-      const alreadyInCart = existingCart.find(item => item._id === product._id);
-      if (alreadyInCart) {
-        alreadyInCart.quantity += 1;
-      } else {
-        existingCart.push({ ...product, quantity: 1 });
-      }
-      localStorage.setItem('cart', JSON.stringify(existingCart));
-      toast.success("Added to cart");
-    }}
-    className="flex-1 bg-blue-500/90 hover:bg-black text-white text-sm py-1 rounded transition"
-  >
-    Add
-  </button>
-
-
+            {/* Buttons */}
+            <div className="mt-auto flex gap-2">
+              <Link
+                to={`/products/${product._id}`}
+                className="flex-1 bg-black hover:bg-blue-500/90 text-white text-sm py-1 rounded text-center transition"
+              >
+                View
+              </Link>
+              <button
+                onClick={() => {
+                  const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
+                  const alreadyInCart = existingCart.find(item => item._id === product._id);
+                  if (alreadyInCart) {
+                    alreadyInCart.quantity += 1;
+                  } else {
+                    existingCart.push({ ...product, quantity: 1 });
+                  }
+                  localStorage.setItem('cart', JSON.stringify(existingCart));
+                  toast.success("Added to cart");
+                }}
+                className={`flex-1 ${
+                  product.availability
+                    ? 'bg-blue-500/90 hover:bg-black'
+                    : 'bg-gray-300 cursor-not-allowed'
+                } text-white text-sm py-1 rounded transition`}
+                disabled={!product.availability}
+              >
+                Add
+              </button>
             </div>
           </div>
         </div>
@@ -176,6 +190,7 @@ function HomePage() {
     </div>
   )}
 </div>
+
 
 
     {/* ✅ Ultra Clean, Blue-Themed Stats Section with Bottom Borders */}

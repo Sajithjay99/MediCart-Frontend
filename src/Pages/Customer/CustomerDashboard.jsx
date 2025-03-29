@@ -9,6 +9,7 @@ import HomePage from './Home/HomePage'
 import About from './Home/About'
 import Footer from '../../components/Footer'
 import ContactUs from './Home/contactUs'
+import Checkout from './Shop/Checkout'
 
 function CustomerDashboard() {
   return (
@@ -30,6 +31,7 @@ function CustomerDashboard() {
   <Route path="/contactus" element={<ContactUs/>} />
   <Route path="/products/:id" element={<ProductOverview />} />
   <Route path="/cart" element={<ProductCart />} />
+  <Route path="/checkout" element={<Checkout />} />
 
 
 </Routes>

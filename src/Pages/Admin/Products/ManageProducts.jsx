@@ -85,6 +85,7 @@ function ManageProducts() {
           <thead className="bg-gray-200 text-left">
             <tr>
               <th className="py-2 px-4 border-b">Name</th>
+              <th className="py-2 px-4 border-b">Brand</th>
               <th className="py-2 px-4 border-b">Category</th>
               <th className="py-2 px-4 border-b">Price</th>
               <th className="py-2 px-4 border-b">Actions</th>
@@ -94,11 +95,12 @@ function ManageProducts() {
             {products.map((prod) => (
               <tr key={prod._id}>
                 <td className="py-2 px-4 border-b">{prod.name}</td>
+                <td className="py-2 px-4 border-b">{prod.brand}</td>
                 <td className="py-2 px-4 border-b">{prod.category}</td>
                 <td className="py-2 px-4 border-b">Rs.{prod.price}</td>
                 <td className="py-2 px-4 border-b space-x-2">
                   <button
-                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    className="bg-blue-500/90 text-white px-3 py-1 rounded hover:bg-black"
                     onClick={() => {
                       setSelectedProduct(prod);
                       setViewModal(true);
@@ -107,7 +109,7 @@ function ManageProducts() {
                     View
                   </button>
                   <button
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                    className="bg-black text-white px-3 py-1 rounded hover:bg-blue-500/90"
                     onClick={() => {
                       setSelectedProduct({ ...prod });
                       setEditModal(true);
@@ -134,11 +136,11 @@ function ManageProducts() {
           <div className="bg-white w-[400px] p-6 rounded shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Product Details</h2>
             <p><strong>Name:</strong> {selectedProduct.name}</p>
+            <p><strong>Brand:</strong> {selectedProduct.brand}</p>
             <p><strong>Category:</strong> {selectedProduct.category}</p>
             <p><strong>Description:</strong> {selectedProduct.description}</p>
             <p><strong>Price:</strong> ₹{selectedProduct.price}</p>
             <p><strong>Availability:</strong> {selectedProduct.availability ? 'Available' : 'Not Available'}</p>
-            <p><strong>Expiry Date:</strong> {selectedProduct.expiryDate?.substring(0, 10)}</p>
 
             <p className="font-semibold mt-2">Images:</p>
             <div className="grid grid-cols-2 gap-2 my-2">
@@ -169,45 +171,115 @@ function ManageProducts() {
   <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-xl bg-white/10">
     <div className="bg-white w-[450px] p-6 rounded shadow-lg">
       <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-      <form className="space-y-3" onSubmit={handleEditSubmit}>
+
+      <form
+        className="space-y-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const { name, brand, category, price, description } = selectedProduct;
+
+          if (!name || name.trim().length < 3) {
+            toast.error("Product name must be at least 3 characters");
+            return;
+          }
+
+          if (!brand || brand.trim().length < 2) {
+            toast.error("Brand is required");
+            return;
+          }
+
+          if (!category || category.trim().length < 3) {
+            toast.error("Please select a valid category");
+            return;
+          }
+
+          if (!price || isNaN(price) || Number(price) <= 0) {
+            toast.error("Price must be a valid number greater than 0");
+            return;
+          }
+
+          if (description && description.trim().length > 0 && description.trim().length < 10) {
+            toast.error("Description should be at least 10 characters or leave it empty");
+            return;
+          }
+
+          handleEditSubmit(e);
+        }}
+      >
         <input
           type="text"
           className="w-full p-2 border rounded"
           placeholder="Name"
           value={selectedProduct.name}
-          onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
+          onChange={(e) =>
+            setSelectedProduct({ ...selectedProduct, name: e.target.value })
+          }
           required
         />
         <input
           type="text"
           className="w-full p-2 border rounded"
-          placeholder="Category"
-          value={selectedProduct.category}
-          onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e.target.value })}
+          placeholder="Brand"
+          value={selectedProduct.brand}
+          onChange={(e) =>
+            setSelectedProduct({ ...selectedProduct, brand: e.target.value })
+          }
           required
         />
+
+        {/* Category Dropdown with enum values */}
+        <select
+          className="w-full p-2 border rounded"
+          value={selectedProduct.category}
+          onChange={(e) =>
+            setSelectedProduct({ ...selectedProduct, category: e.target.value })
+          }
+          required
+        >
+          <option value="">Select Category</option>
+          {[
+            'Adult Care',
+            'Beauty Accessories',
+            'Beverages',
+            'Cosmetics',
+            'Dairy Products',
+            'Kids',
+            'Mother & Baby Care',
+            'Personal Care',
+            'Pet Care',
+            'Skin Care',
+            'Surgical Items',
+            'Vitamins & Nutritions',
+            'Others',
+          ].map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+
         <textarea
           className="w-full p-2 border rounded"
           placeholder="Description"
           value={selectedProduct.description}
-          onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })}
+          onChange={(e) =>
+            setSelectedProduct({ ...selectedProduct, description: e.target.value })
+          }
         />
+
         <input
           type="number"
           className="w-full p-2 border rounded"
           placeholder="Price"
           value={selectedProduct.price}
-          onChange={(e) => setSelectedProduct({ ...selectedProduct, price: e.target.value })}
+          onChange={(e) =>
+            setSelectedProduct({ ...selectedProduct, price: e.target.value })
+          }
           required
-        />
-        <input
-          type="date"
-          className="w-full p-2 border rounded"
-          value={selectedProduct.expiryDate?.substring(0, 10)}
-          onChange={(e) => setSelectedProduct({ ...selectedProduct, expiryDate: e.target.value })}
+          min="1"
         />
 
-        {/* ✅ Existing image previews with delete button */}
+        {/* Image previews */}
         <div className="grid grid-cols-2 gap-2">
           {(selectedProduct.images || []).map((img, idx) => (
             <div key={idx} className="relative">
@@ -231,7 +303,7 @@ function ManageProducts() {
           ))}
         </div>
 
-        {/* ➕ Upload new images */}
+        {/* Upload more images */}
         <input
           type="file"
           multiple
@@ -263,7 +335,7 @@ function ManageProducts() {
           className="w-full p-2 border rounded"
         />
 
-        {/* Availability */}
+        {/* Availability toggle */}
         <div className="flex items-center gap-2 mt-2">
           <input
             type="checkbox"
@@ -279,7 +351,10 @@ function ManageProducts() {
         </div>
 
         <div className="flex justify-between mt-4">
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
             Save
           </button>
           <button
@@ -294,8 +369,9 @@ function ManageProducts() {
     </div>
   </div>
 )}
-    </div>
-  );
-}
+  
+      </div>
+    );
+  }
 
 export default ManageProducts;

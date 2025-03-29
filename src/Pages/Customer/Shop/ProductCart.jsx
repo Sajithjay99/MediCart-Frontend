@@ -35,7 +35,10 @@ function ProductCart() {
     navigate('/checkout');
   };
 
-  const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalAmount = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 
   if (cartItems.length === 0) {
     return (
@@ -49,13 +52,13 @@ function ProductCart() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <div className="bg-white rounded-lg shadow p-6 md:p-8">
-        <h2 className="text-2xl font-bold text-blue-700 mb-6"> Your Cart</h2>
+        <h2 className="text-2xl font-bold text-blue-700 mb-6">Your Cart</h2>
 
         <div className="space-y-6">
           {cartItems.map((item, idx) => (
             <div
               key={idx}
-              className="flex flex-col md:flex-row items-start md:items-center justify-between border-b pb-4 gap-4"
+              className="flex flex-col md:flex-row items-start md:items-center justify-between border-b pb-5 gap-4"
             >
               {/* Product Info */}
               <div className="flex items-start gap-4 w-full">
@@ -65,11 +68,14 @@ function ProductCart() {
                   className="w-24 h-24 object-contain rounded border"
                 />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg text-blue-800">{item.name}</h3>
+                  <h3 className="font-semibold text-lg text-gray-800 capitalize">{item.name}</h3>
                   <p className="text-sm text-gray-500">{item.category}</p>
-                  <p className="text-green-600 font-semibold mt-1">Rs.{item.price}</p>
+                  <p className="text-xs italic text-gray-400">Brand: {item.brand}</p>
 
-                  <div className="mt-2 flex items-center gap-2">
+                  <p className="text-green-600 font-semibold mt-1 text-[15px]">Rs.{item.price}</p>
+
+                  {/* Quantity */}
+                  <div className="mt-3 flex items-center gap-2">
                     <label className="text-sm font-medium">Qty:</label>
                     <input
                       type="number"
@@ -95,7 +101,7 @@ function ProductCart() {
           ))}
         </div>
 
-        {/* Bottom section */}
+        {/* Total & Checkout */}
         <div className="mt-10 border-t pt-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h3 className="text-xl font-bold text-blue-700">
             Total: Rs.{totalAmount.toLocaleString()}
