@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.3",
     "@tailwindcss/vite": "^4.0.15",
     "axios": "^1.8.4",
+    "cross-env": "^7.0.3",
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
