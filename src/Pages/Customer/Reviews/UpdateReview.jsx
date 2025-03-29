@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import mediaUpload from '../../../utils/mediaupload';
- 
+
 function UpdateReview() {
   const { id } = useParams();
   const [review, setReview] = useState({});
@@ -15,36 +15,30 @@ function UpdateReview() {
   const [commentError, setCommentError] = useState('');
   const [ratingError, setRatingError] = useState('');
   const navigate = useNavigate();
- 
-  // Fetch review data for updating
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/customerlogin');
-      return; // Redirect to login if no token exists
+      return;
     }
- 
-    // Ensure id is not empty before fetching
+
     if (!id) {
       toast.error('No review ID provided');
       navigate('/reviews');
       return;
     }
- 
+
     axios
-      .get(`http://localhost:5000/api/reviews//getOwnOneReview/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+      .get(`http://localhost:5000/api/reviews/getOwnOneReview/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       })
       .then((response) => {
         const reviewData = response.data;
- 
-        // Check if the review data is correct
         if (reviewData) {
           setReview(reviewData);
           setComment(reviewData.comment || '');
-          setRating(reviewData.rating || 0);    
+          setRating(reviewData.rating || 0);
           setRecommendation(reviewData.recommendation || false);
           setImage(reviewData.image || null);
           setReviewType(reviewData.reviewType || '');
@@ -53,38 +47,32 @@ function UpdateReview() {
           navigate('/reviews');
         }
       })
-      .catch((err) => {
+      .catch(() => {
         toast.error('Failed to fetch review for updating');
-        console.error("Error fetching review:", err);
       });
-  }, [id, navigate]); // Only run when `id` or `navigate` changes
- 
-  // Handle image change
+  }, [id, navigate]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file); // Set the image file
+      setImage(file);
     }
   };
- 
-  // Handle update review form submission
+
   const handleUpdateReview = async (e) => {
     e.preventDefault();
- 
-    // Validation checks
+
     if (rating === 0) {
       setRatingError('Rating is required');
       return;
     }
- 
+
     if (comment === '') {
       setCommentError('Comment is required');
       return;
     }
- 
+
     let imageUrl = '';
- 
-    // If image is uploaded, handle the image upload
     if (image) {
       const uploadResult = await mediaUpload(image);
       if (uploadResult.error) {
@@ -93,16 +81,15 @@ function UpdateReview() {
       }
       imageUrl = uploadResult.url;
     }
- 
-    // Prepare the updated review data
+
     const updatedReview = {
       rating,
       comment,
       recommendation,
       reviewType,
-      image: imageUrl || review.image, // Use existing image if no new image is uploaded
+      image: imageUrl || review.image,
     };
- 
+
     try {
       await axios.put(`http://localhost:5000/api/reviews/updatebycustomer/${id}`, updatedReview, {
         headers: {
@@ -110,75 +97,72 @@ function UpdateReview() {
         },
       });
       toast.success('Review updated successfully');
-      navigate('/reviews'); // Redirect after success
+      navigate('/reviews');
     } catch (err) {
       toast.error('Failed to update review');
-      console.error("Error updating review:", err);
     }
   };
- 
-  // Handle comment change
+
   const handleCommentChange = (e) => {
     const newComment = e.target.value;
     setComment(newComment);
- 
+
     if (newComment.length > 100) {
       setCommentError('Comment cannot exceed 100 characters');
     } else {
       setCommentError('');
     }
   };
- 
-  // Handle rating change
+
   const handleRatingChange = (star) => {
     setRating(star);
-    setRatingError(''); // Reset error when rating is changed
+    setRatingError('');
   };
- 
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Update Review</h1>
- 
-      <form onSubmit={handleUpdateReview} className="space-y-4">
-        {/* Rating (Editable) */}
-        <div>
+    <div className="p-6 max-w-xl mx-auto border border-gray-300 rounded-lg shadow-lg">
+      <h1 className="text-2xl font-bold mb-6 text-center">Update Your Review</h1>
+
+      <form onSubmit={handleUpdateReview} className="space-y-6">
+        {/* Rating */}
+        <div className="space-y-2">
           <label className="block text-sm font-semibold">Rating (1-5)</label>
-          <div className="flex items-center">
+          <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={() => handleRatingChange(star)}
-                className={`${rating >= star ? 'text-yellow-500' : 'text-gray-400'} text-xl`}
+                className={`text-xl ${rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
               >
                 ★
               </button>
             ))}
           </div>
-          {ratingError && <p className="text-red-500">{ratingError}</p>}
+          {ratingError && <p className="text-red-500 text-sm">{ratingError}</p>}
         </div>
- 
-        {/* Comment (Editable) */}
-        <div>
+
+        {/* Comment */}
+        <div className="space-y-2">
           <label className="block text-sm font-semibold">Comment</label>
           <textarea
             value={comment}
             onChange={handleCommentChange}
-            className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
             rows="4"
-            placeholder="Update your comment here"
+            placeholder="Write your comment here"
             required
           />
-          {commentError && <p className="text-red-500">{commentError}</p>}
+          {commentError && <p className="text-red-500 text-sm">{commentError}</p>}
         </div>
- 
-        {/* Review Type (Editable) */}
-        <div>
+
+        {/* Review Type */}
+        <div className="space-y-2">
           <label className="block text-sm font-semibold">Review Type</label>
           <select
             value={reviewType}
             onChange={(e) => setReviewType(e.target.value)}
-            className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
           >
             <option value="">Select Review Type</option>
             <option value="Customer Service">Customer Service</option>
@@ -189,9 +173,9 @@ function UpdateReview() {
             <option value="Other">Other</option>
           </select>
         </div>
- 
-        {/* Would you recommend this? */}
-        <div>
+
+        {/* Recommendation */}
+        <div className="space-y-2">
           <label className="block text-sm font-semibold">Would you recommend this?</label>
           <div className="flex gap-4">
             <label>
@@ -216,25 +200,30 @@ function UpdateReview() {
             </label>
           </div>
         </div>
- 
-        {/* Image (Editable) */}
-        <div>
+
+        {/* Image Upload */}
+        <div className="space-y-2">
           <label className="block text-sm font-semibold">Upload Image (optional)</label>
           <input
             type="file"
             onChange={handleImageChange}
-            className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
           />
         </div>
- 
+
         {/* Display the image if available */}
         {image && (
           <div className="mt-4">
             <p>Selected Image:</p>
-            <img src={URL.createObjectURL(image)} alt="Selected Review Image" className="w-32 h-32 object-cover mt-2" />
+            <img
+              src={URL.createObjectURL(image)}
+              alt="Selected Review Image"
+              className="w-32 h-32 object-cover mt-2"
+            />
           </div>
         )}
- 
+
+        {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
@@ -247,7 +236,5 @@ function UpdateReview() {
     </div>
   );
 }
- 
+
 export default UpdateReview;
- 
- 
