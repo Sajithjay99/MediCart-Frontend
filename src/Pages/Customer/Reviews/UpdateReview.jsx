@@ -180,6 +180,7 @@ function UpdateReview() {
             onChange={(e) => setReviewType(e.target.value)}
             className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
           >
+            <option value="">Select Review Type</option>
             <option value="Customer Service">Customer Service</option>
             <option value="Delivery Service">Delivery Service</option>
             <option value="Online Ordering Experience">Online Ordering Experience</option>
