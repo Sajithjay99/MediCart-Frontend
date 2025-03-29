@@ -2,6 +2,10 @@ import React from 'react'
  import Header from '../../components/header'
   import { Routes, Route } from 'react-router-dom'
 import Customerlogin from '../Customer Login/customerlogin'
+import Review from './Reviews/Review' 
+import AddReview from './Reviews/AddReview'
+import ViewOwnReview from './Reviews/ViewOwnReview'
+import AboutUs from '../../components/AboutUs'
 
 function CustomerDashboard() {
   return (
@@ -18,9 +22,12 @@ function CustomerDashboard() {
   <Route path="/" element={<h1>Home page</h1>} />
   <Route path="/shop" element={<h1>Shop page</h1>} />
   <Route path="/medicine" element={<h1>Medicine page</h1>} />
-  <Route path="/reviews" element={<h1>Review page</h1>} />
-  <Route path="/about" element={<h1>About page</h1>} />
+  <Route path="/reviews" element={<Review />} />
+  <Route path="/about" element={<AboutUs/>} />
   <Route path="/contactus" element={<h1>Contact page</h1>} />
+  <Route path="/add-review" element={<AddReview />} />
+  <Route path="/my-review" element={<ViewOwnReview />} />
+  
 </Routes>
 
 
