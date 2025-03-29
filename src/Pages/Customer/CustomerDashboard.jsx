@@ -6,6 +6,9 @@ import Customerlogin from '../Customer Login/customerlogin'
 import ProductOverview from './Shop/ProductOverview'
 import ProductCart from './Shop/ProductCart'
 import HomePage from './Home/HomePage'
+import About from './Home/About'
+import Footer from '../../components/Footer'
+import ContactUs from './Home/contactUs'
 
 function CustomerDashboard() {
   return (
@@ -23,8 +26,8 @@ function CustomerDashboard() {
   <Route path="/shop" element={<ProductsCustomer/>} />
   <Route path="/medicine" element={<h1>Medicine page</h1>} />
   <Route path="/reviews" element={<h1>Review page</h1>} />
-  <Route path="/about" element={<h1>About page</h1>} />
-  <Route path="/contactus" element={<h1>Contact page</h1>} />
+  <Route path="/about" element={<About/>} />
+  <Route path="/contactus" element={<ContactUs/>} />
   <Route path="/products/:id" element={<ProductOverview />} />
   <Route path="/cart" element={<ProductCart />} />
 
@@ -38,6 +41,7 @@ function CustomerDashboard() {
 
 
 <div>
+<Footer/>
 
 
 </div>

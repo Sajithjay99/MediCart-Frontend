@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaUser, FaShoppingCart } from "react-icons/fa";
 import { jwtDecode } from 'jwt-decode';
-import toast from 'react-hot-toast';
+
 
 function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
   const token = localStorage.getItem('token');
   const [userRole, setUserRole] = useState(null);
@@ -23,7 +24,6 @@ function Header() {
     }
   }, [token]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -36,33 +36,40 @@ function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-   
     navigate('/');
     window.location.reload();
-    toast.success("Logged out successfully");
   };
 
-  return (
-    <div className='w-full h-[100px] bg-blue-500 flex items-center justify-center relative text-white'>
+  // Reusable class for nav links
+  const navLinkClasses = (path) =>
+    `font-semibold px-6 transition duration-200 ${
+      location.pathname === path
+        ? 'text-black'
+        : 'hover:text-blue-200'
+    }`;
 
+  return (
+    <div className='w-full h-[100px] bg-blue-500/90 backdrop-blur-md flex items-center justify-center relative text-white z-50'>
+
+      {/* Logo */}
       <img
         src="/logo.png"
         alt="logo"
         className='w-[90px] h-[90px] rounded-full absolute left-10 border-[1px] object-cover border-black'
       />
-      
 
-      <Link to="/" className='font-semibold px-6 hover:underline transition'>Home</Link>
-      <Link to="/shop" className='font-semibold px-6 hover:underline transition'>Shop</Link>
-      <Link to="/medicine" className='font-semibold px-6 hover:underline transition'>Medicine</Link>
-      <Link to="/reviews" className='font-semibold px-6 hover:underline transition'>Reviews</Link>
-      <Link to="/about" className='font-semibold px-6 hover:underline transition'>About</Link>
-      <Link to="/contactus" className='font-semibold px-6 hover:underline transition'>Contact Us</Link>
+      {/* Navigation */}
+      <Link to="/" className={navLinkClasses('/')}>Home</Link>
+      <Link to="/shop" className={navLinkClasses('/shop')}>Shop</Link>
+      <Link to="/medicine" className={navLinkClasses('/medicine')}>Medicine</Link>
+      <Link to="/reviews" className={navLinkClasses('/reviews')}>Reviews</Link>
+      <Link to="/about" className={navLinkClasses('/about')}>About</Link>
+      <Link to="/contactus" className={navLinkClasses('/contactus')}>Contact Us</Link>
 
-      {/* Cart and Profile Icons */}
+      {/* Cart & Profile */}
       <div className='absolute right-10 flex items-center space-x-5'>
 
-        {/* Cart Icon */}
+        {/* Cart */}
         <Link to="/cart" className="relative hover:text-gray-100 transition">
           <FaShoppingCart size={26} />
           {cart.length > 0 && (

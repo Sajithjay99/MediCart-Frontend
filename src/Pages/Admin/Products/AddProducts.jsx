@@ -76,7 +76,6 @@ function AddProducts() {
       toast.error('Failed to add product');
     }
   };
-
   
   const handleCancel = () => {
     setName('');

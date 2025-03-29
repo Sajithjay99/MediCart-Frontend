@@ -99,7 +99,7 @@ function ProductCard({ product }) {
         <div className="mt-auto flex justify-between space-x-2 pt-2 border-t border-gray-100">
           <button
             onClick={handleViewDetails}
-            className="w-1/2 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="w-1/2 py-2 text-sm bg-black text-white rounded hover:bg-blue-500/90 transition"
           >
             View Details
           </button>
@@ -108,7 +108,7 @@ function ProductCard({ product }) {
             disabled={!product.availability}
             className={`w-1/2 py-2 text-sm text-white rounded transition ${
               product.availability
-                ? 'bg-red-400 hover:bg-red-600'
+                ? 'bg-blue-500/90 hover:bg-black'
                 : 'bg-gray-300 cursor-not-allowed'
             }`}
           >

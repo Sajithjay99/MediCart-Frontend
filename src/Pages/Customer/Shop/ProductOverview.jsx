@@ -44,94 +44,103 @@ function ProductOverview() {
 
     localStorage.setItem('cart', JSON.stringify(existingCart));
     toast.success('Product added to cart!');
-    navigate('/cart'); // Navigate to cart after adding
+    navigate('/cart');
   };
 
   if (status === 'loading') {
-    return <div className="text-center py-10 text-lg">Loading...</div>;
+    return <div className="text-center py-20 text-blue-600">Loading...</div>;
   }
 
   if (status === 'error' || !product) {
-    return <div className="text-center text-red-600 py-10">Failed to load product</div>;
+    return <div className="text-center py-20 text-red-600">Failed to load product</div>;
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md mt-6">
-      <h2 className="text-3xl font-bold mb-6 text-blue-700">{product.name}</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Image Section */}
-        <div>
-          {selectedImage ? (
-            <img
-              src={selectedImage}
-              alt="Selected"
-              className="w-full h-[320px] object-contain rounded border"
-            />
-          ) : (
-            <div className="w-full h-[320px] bg-gray-100 text-gray-500 flex items-center justify-center rounded border">
-              No Image Available
+    <div className="max-w-5xl mx-auto px-4 py-10">
+      <div className="bg-white shadow-md rounded-lg p-6 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          {/* Left - Image Section */}
+          <div>
+            <div className="border rounded-lg h-[300px] flex items-center justify-center overflow-hidden">
+              <img
+                src={selectedImage}
+                alt={product.name}
+                className="object-contain max-h-full max-w-full"
+              />
             </div>
-          )}
 
-          {product.images?.length > 1 && (
-            <div className="flex gap-2 mt-4">
-              {product.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Thumbnail ${index + 1}`}
-                  onClick={() => setSelectedImage(img)}
-                  className={`w-16 h-16 object-cover border rounded cursor-pointer transition ${
-                    selectedImage === img ? 'ring-2 ring-blue-500' : ''
-                  }`}
-                />
-              ))}
+            {product.images?.length > 1 && (
+              <div className="flex gap-3 mt-4">
+                {product.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`thumb-${idx}`}
+                    onClick={() => setSelectedImage(img)}
+                    className={`w-14 h-14 object-cover border rounded cursor-pointer transition-all ${
+                      selectedImage === img ? 'ring-2 ring-blue-500' : 'hover:ring hover:ring-blue-300'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right - Product Info */}
+          <div className="space-y-3">
+            <h1 className="text-2xl font-bold text-blue-700">{product.name}</h1>
+            <p className="text-sm text-gray-500">{product.category}</p>
+            {product.brand && (
+              <p className="text-sm text-gray-600">
+                <strong>Brand:</strong> {product.brand}
+              </p>
+            )}
+            <div className="text-lg font-semibold text-green-600 mt-2">
+              ₹{product.price}
             </div>
-          )}
-        </div>
+            <div className="text-sm text-gray-700">
+              <strong>Availability:</strong>{' '}
+              <span
+                className={`ml-1 px-2 py-1 rounded text-xs font-medium ${
+                  product.availability ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
+                }`}
+              >
+                {product.availability ? 'In Stock' : 'Out of Stock'}
+              </span>
+            </div>
+            <div className="text-sm text-gray-600">
+              <strong>Expiry Date:</strong>{' '}
+              {product.expiryDate
+                ? new Date(product.expiryDate).toLocaleDateString()
+                : 'N/A'}
+            </div>
 
-        {/* Info Section */}
-        <div className="space-y-4">
-          <p className="text-gray-700"><strong>Category:</strong> {product.category}</p>
-          <p className="text-gray-700"><strong>Description:</strong> {product.description || 'No description provided.'}</p>
-          <p className="text-xl text-green-600 font-semibold"><strong>₹{product.price}</strong></p>
-          <p>
-            <strong>Availability:</strong>{' '}
-            <span
-              className={`px-2 py-1 rounded text-sm font-medium ${
-                product.availability ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
-              }`}
-            >
-              {product.availability ? 'In Stock' : 'Out of Stock'}
-            </span>
-          </p>
-          <p>
-            <strong>Expiry Date:</strong>{' '}
-            {product.expiryDate ? new Date(product.expiryDate).toLocaleDateString() : 'N/A'}
-          </p>
+            {product.description && (
+              <p className="text-sm text-gray-600 pt-2">{product.description}</p>
+            )}
 
-          {/* Quantity & Add to Cart */}
-          <div className="flex items-center gap-4 mt-6">
-            <label className="font-medium">Qty:</label>
-            <input
-              type="number"
-              value={quantity}
-              min={1}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className="w-20 p-1 border rounded text-center"
-            />
-            <button
-              onClick={handleAddToCart}
-              disabled={!product.availability}
-              className={`px-5 py-2 rounded text-white font-semibold transition ${
-                product.availability
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-gray-400 cursor-not-allowed'
-              }`}
-            >
-              Add to Cart
-            </button>
+            {/* Quantity & Add to Cart */}
+            <div className="flex items-center gap-4 mt-4">
+              <label className="text-sm font-medium">Qty:</label>
+              <input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+                className="w-16 px-2 py-1 border rounded text-sm text-center"
+              />
+              <button
+                onClick={handleAddToCart}
+                disabled={!product.availability}
+                className={`px-5 py-2 rounded text-white text-sm font-semibold transition ${
+                  product.availability
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+              >
+                Add to Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>
