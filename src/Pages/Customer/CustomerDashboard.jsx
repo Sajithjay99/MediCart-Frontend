@@ -24,7 +24,7 @@ function CustomerDashboard() {
 
   <Route path="/medicine" element={<CreateMedicine />} />
   <Route path="/profile/my-orders" element={<MyOrders/>} />
-  <Route path="/updateorders/:orderId" element={<UpdateOrders />} />
+
   
   
 

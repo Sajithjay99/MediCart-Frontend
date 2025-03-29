@@ -1,267 +1,204 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import mediaUpload from "../../utils/mediaUpload";
 
-const URL = "http://localhost:5000/api/orders/";
+const URL = "http://localhost:5000/api/orders/myorders";
 
-function UpdateOrder() {
-  const [orderDetails, setOrderDetails] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    duration: "",
-    gender: null,
-    receiveSubstitutes: false,
-    allergies: "",
-    orderDate: "",
-    note: "",
-    prescriptionImage: "",
-  });
-  const [uploading, setUploading] = useState(false);
-  const { orderId } = useParams(); // Get order ID from URL parameters
+function MyOrders() {
+  const [myorders, setMyOrders] = useState([]);
   const navigate = useNavigate();
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const location = useLocation();
+
+  // If the data is passed via state (like from a previous component)
+  const passedOrders = location.state?.orders;
 
   useEffect(() => {
-    const fetchOrderDetails = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          toast.error("Token missing, please log in again.");
-          return;
-        }
-  
-        const decoded = jwtDecode(token);
-        if (decoded.role !== "customer") {
-          toast.error("You are not authorized to update orders");
-          return;
-        }
-  
-        const response = await axios.get(`${URL}myorders/${orderId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        setOrderDetails(response.data);
-      } catch (err) {
-        console.error("Error fetching order details:", err);
-        toast.error("Failed to fetch order details");
-      }
-    };
-  
-    fetchOrderDetails();
-  }, [orderId]);
-  
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploading(true);
-    const result = await mediaUpload(file);
-    setUploading(false);
-
-    if (result.error) {
-      toast.error("Error uploading file: " + result.message);
-      return;
-    }
-
-    setOrderDetails((prevDetails) => ({
-      ...prevDetails,
-      prescriptionImage: result.url,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { name, phone, email, address, duration, gender, receiveSubstitutes, allergies, orderDate, note, prescriptionImage } = orderDetails;
-
-    const nameRegex = /^[A-Za-z\s]+$/;
-    if (!nameRegex.test(name)) {
-      toast.error("Name should contain only letters and spaces.");
-      return;
-    }
-
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone)) {
-      toast.error("Please enter a valid 10-digit phone number.");
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address.");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirecting to login.");
+      navigate("/login", { replace: true });
       return;
     }
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Token missing, please log in again.");
+      const decoded = jwtDecode(token);
+      if (decoded.role !== "customer") {
+        navigate("/", { replace: true });
         return;
       }
+    } catch (error) {
+      console.error("Invalid token, redirecting to login.");
+      navigate("/login", { replace: true });
+      return;
+    }
 
-      await axios.put(`${URL}update/${orderId}`, {
-        name,
-        phone,
-        email,
-        address,
-        duration,
-        gender,
-        receiveSubstitutes,
-        allergies,
-        orderDate,
-        note,
-        prescriptionImage,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const fetchOrders = async () => {
+      if (passedOrders) {
+        // If orders were passed via state, use that data
+        setMyOrders(passedOrders);
+      } else {
+        // Fetch orders from the API if not passed through state
+        try {
+          const res = await axios.get(URL, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setMyOrders(res.data || []);
+        } catch (err) {
+          console.error("Error fetching orders:", err);
+        }
+      }
+    };
+
+    fetchOrders();
+  }, [navigate, passedOrders]);
+
+  const handleUpdate = (order) => {
+    navigate(`/updateorders/${order._id}`, { state: { order } });
+  };
+
+  const handleView = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedOrder(null);
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirecting to login.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const confirm = window.confirm("Are you sure you want to delete this order?");
+    if (!confirm) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/orders/deletebycustomer/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      toast.success("Order updated successfully");
-      navigate("/profile/my-orders");
+      setMyOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
     } catch (err) {
-      console.error("Error updating order:", err);
-      toast.error("Failed to update order: " + (err.response?.data?.message || err.message));
+      console.error("Error deleting order:", err);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Update Medicine Order</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 font-medium">Name:</label>
-            <input
-              type="text"
-              value={orderDetails.name}
-              onChange={(e) => setOrderDetails({ ...orderDetails, name: e.target.value })}
-              required
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Phone:</label>
-            <input
-              type="text"
-              value={orderDetails.phone}
-              onChange={(e) => setOrderDetails({ ...orderDetails, phone: e.target.value })}
-              required
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Email:</label>
-            <input
-              type="email"
-              value={orderDetails.email}
-              onChange={(e) => setOrderDetails({ ...orderDetails, email: e.target.value })}
-              required
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Address:</label>
-            <input
-              type="text"
-              value={orderDetails.address}
-              onChange={(e) => setOrderDetails({ ...orderDetails, address: e.target.value })}
-              required
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Duration:</label>
-            <input
-              type="text"
-              value={orderDetails.duration}
-              onChange={(e) => setOrderDetails({ ...orderDetails, duration: e.target.value })}
-              required
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Gender:</label>
-            <select
-              value={orderDetails.gender === null ? "" : orderDetails.gender ? "true" : "false"}
-              onChange={(e) => setOrderDetails({ ...orderDetails, gender: e.target.value === "true" })}
-              required
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Gender</option>
-              <option value="true">Male</option>
-              <option value="false">Female</option>
-            </select>
-          </div>
-        </div>
+    <div>
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">My Orders</h1>
+      <table className="w-full border-collapse border border-gray-300 shadow-md rounded-lg overflow-hidden">
+        <thead>
+          <tr className="bg-gray-100 text-gray-700 uppercase text-sm">
+            <th className="px-4 py-2 border">Order ID</th>
+            <th className="px-4 py-2 border">Order date</th>
+            <th className="px-4 py-2 border">Status</th>
+            <th className="px-4 py-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {myorders.length > 0 ? (
+            myorders.map((myorder, index) => (
+              <tr key={myorder._id || index} className="hover:bg-gray-50 transition duration-150">
+                <td className="px-4 py-2 border text-center">{index + 1}</td>
+                <td className="px-4 py-2 border text-center">
+                  {new Date(myorder.order_date).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-2 border text-center">
+                  <span
+                    className={`px-2 py-1 text-sm rounded-full ${
+                      myorder.isApproved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {myorder.isApproved ? "Approved" : "Pending"}
+                  </span>
+                </td>
+                <td className="px-4 py-2 border text-center">
+                  <button
+                    onClick={() => handleView(myorder)}
+                    className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition duration-150 mr-2"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => handleUpdate(myorder)}
+                    disabled={myorder.isApproved} 
+                    className={`${
+                      myorder.isApproved ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                    } text-white px-3 py-1 rounded-md transition duration-150 mr-2`}
+                  >
+                    Update
+                  </button>
+                  <button
+                    onClick={() => handleDeleteOrder(myorder._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-150 mr-2"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="px-4 py-2 border text-center">
+                No orders available
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
 
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={orderDetails.receiveSubstitutes}
-            onChange={(e) => setOrderDetails({ ...orderDetails, receiveSubstitutes: e.target.checked })}
-            className="mr-2"
-          />
-          <label className="text-gray-700 font-medium">Receive Substitutes</label>
+      {/* View Modal */}
+      {isModalOpen && selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
+            <h2 className="text-xl font-semibold mb-4">Order Details</h2>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <p><strong>Name:</strong> {selectedOrder.name}</p>
+              <p><strong>Email:</strong> {selectedOrder.email}</p>
+              <p><strong>Phone:</strong> {selectedOrder.phone}</p>
+              <p><strong>Address:</strong> {selectedOrder.address}</p>
+              <p><strong>Duration:</strong> {selectedOrder.duration}</p>
+              <p><strong>Gender:</strong> {selectedOrder.gender ? "Male" : "Female"}</p>
+              <p><strong>Substitutes:</strong> {selectedOrder.reveive_substitutes ? "Yes" : "No"}</p>
+              <p><strong>Allergies:</strong> {selectedOrder.allergies ? "Yes" : "No"}</p>
+              <p className="col-span-2"><strong>Note:</strong> {selectedOrder.note}</p>
+              <p><strong>Status:</strong> {selectedOrder.isApproved ? "Approved" : "Pending"}</p>
+              <p><strong>Date:</strong> {new Date(selectedOrder.order_date).toLocaleDateString()}</p>
+              <p className="col-span-2">
+                <strong>Prescription:</strong>{" "}
+                <a
+                  href={selectedOrder.prescription_Image}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  View Prescription
+                </a>
+              </p>
+            </div>
+            <div className="text-right mt-6">
+              <button
+                onClick={handleCloseModal}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div>
-          <label className="block text-gray-700 font-medium">Allergies (if any):</label>
-          <input
-            type="text"
-            value={orderDetails.allergies}
-            onChange={(e) => setOrderDetails({ ...orderDetails, allergies: e.target.value })}
-            required
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 font-medium">Order date:</label>
-          <input
-            type="date"
-            value={orderDetails.orderDate}
-            onChange={(e) => setOrderDetails({ ...orderDetails, orderDate: e.target.value })}
-            required
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 font-medium">Note:</label>
-          <textarea
-            value={orderDetails.note}
-            onChange={(e) => setOrderDetails({ ...orderDetails, note: e.target.value })}
-            required
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 font-medium">Prescription Image:</label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="w-full p-2 border border-gray-300 rounded-lg"
-          />
-        </div>
-
-        <div className="text-center">
-          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg" disabled={uploading}>
-            {uploading ? "Uploading..." : "Update Order"}
-          </button>
-        </div>
-      </form>
+      )}
     </div>
   );
 }
 
-export default UpdateOrder;
+export default MyOrders;

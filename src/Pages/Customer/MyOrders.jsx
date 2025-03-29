@@ -10,6 +10,18 @@ function MyOrders() {
   const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [updatedOrder, setUpdatedOrder] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    duration: "",
+    gender: false,
+    reveive_substitutes: false,
+    allergies: false,
+    note: "",
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -47,8 +59,8 @@ function MyOrders() {
 
   // Handle Update (Navigate to the Update Order page)
   const handleUpdate = (order) => {
-    // Navigate to the update page and pass the order data as state
-    navigate(`/updateorders/${order._id}`, { state: { order } });
+    setUpdatedOrder(order);
+    setIsUpdateModalOpen(true);
   };
 
   // Handle View Modal
@@ -61,6 +73,63 @@ function MyOrders() {
   const handleCloseModal = () => {
     setSelectedOrder(null);
     setIsModalOpen(false);
+  };
+
+  // Handle Close Update Modal
+  const handleCloseUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+  };
+
+  // Handle input change for update modal
+  const handleUpdateInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedOrder((prevOrder) => ({
+      ...prevOrder,
+      [name]: value,
+    }));
+  };
+
+  // Submit updated order
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUpdatedOrder((prevOrder) => ({
+          ...prevOrder,
+          prescriptionImage: reader.result, // Store the image data URL in the state
+        }));
+      };
+      reader.readAsDataURL(file); // Convert the image file to base64
+    }
+  };
+  
+  const handleSubmitUpdate = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirecting to login.");
+      navigate("/login", { replace: true });
+      return;
+    }
+  
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/orders/update/${updatedOrder._id}`,
+        updatedOrder,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      // Update the local order list with the updated order
+      setMyOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === updatedOrder._id ? res.data : order
+        )
+      );
+      setIsUpdateModalOpen(false);
+    } catch (err) {
+      console.error("Error updating order:", err);
+    }
   };
 
   // Delete order by user
@@ -192,6 +261,172 @@ function MyOrders() {
           </div>
         </div>
       )}
+
+   {/* Update Modal */}
+{/* Update Modal */}
+{isUpdateModalOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
+      <h2 className="text-xl font-semibold mb-4">Update Order</h2>
+      <div className="grid grid-cols-2 gap-4 text-sm">
+
+        {/* Name and Email */}
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Name</label>
+          <input
+            type="text"
+            name="name"
+            value={updatedOrder.name}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Name"
+          />
+        </div>
+        
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={updatedOrder.email}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Email"
+          />
+        </div>
+
+        {/* Phone and Address */}
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Phone</label>
+          <input
+            type="text"
+            name="phone"
+            value={updatedOrder.phone}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Phone"
+          />
+        </div>
+
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Address</label>
+          <input
+            type="text"
+            name="address"
+            value={updatedOrder.address}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Address"
+          />
+        </div>
+
+        {/* Duration and Gender */}
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Duration</label>
+          <input
+            type="text"
+            name="duration"
+            value={updatedOrder.duration}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Duration"
+          />
+        </div>
+
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Gender</label>
+          <select
+            name="gender"
+            value={updatedOrder.gender}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+          >
+            <option value={true}>Male</option>
+            <option value={false}>Female</option>
+          </select>
+        </div>
+
+        {/* Substitutes and Allergies */}
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Substitutes</label>
+          <input
+            type="checkbox"
+            name="reveive_substitutes"
+            checked={updatedOrder.reveive_substitutes}
+            onChange={(e) => setUpdatedOrder({ ...updatedOrder, reveive_substitutes: e.target.checked })}
+            className="w-4 h-4"
+          />
+        </div>
+
+        <div className="col-span-1">
+          <label className="inline-block text-sm font-semibold">Allergies</label>
+          <input
+            type="text"
+            name="allergies"
+            value={updatedOrder.allergies}
+            onChange={(e) => setUpdatedOrder({ ...updatedOrder, allergies: e.target.value })}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Allergies"
+          />
+        </div>
+
+        {/* Note */}
+        <div className="col-span-2">
+          <label className="inline-block text-sm font-semibold">Note</label>
+          <textarea
+            name="note"
+            value={updatedOrder.note}
+            onChange={handleUpdateInputChange}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+            placeholder="Note"
+          />
+        </div>
+
+        {/* Date Input */}
+        
+
+        <div className="col-span-2">
+          <label className="inline-block text-sm font-semibold">Prescription Image</label>
+          <input
+            type="file"
+            name="prescriptionImage"
+            onChange={(e) => handleImageChange(e)}
+            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+          />
+          {/* Show Image if Exists */}
+          {updatedOrder.prescriptionImage && (
+            <div className="mt-2">
+              <img
+                src={updatedOrder.prescriptionImage}
+                alt="Prescription"
+                className="w-32 h-32 object-cover"
+              />
+            </div>
+          )}
+        </div>
+     
+      </div>
+
+      {/* Save and Cancel Buttons */}
+      <div className="text-right mt-6">
+        <button
+          onClick={handleSubmitUpdate}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+        >
+          Save Changes
+        </button>
+        <button
+          onClick={handleCloseUpdateModal}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }
