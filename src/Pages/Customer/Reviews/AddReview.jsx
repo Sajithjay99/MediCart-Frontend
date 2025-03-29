@@ -121,152 +121,153 @@ function AddReview() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
-      <div className="bg-white p-9 rounded-lg shadow-lg w-full max-w-lg flex items-start">
-        <div className="w-4/5">
-          <h1 className="text-2xl font-bold mb-4">Add Your Review</h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-semibold">Name</label>
-              <input
-                type="text"
-                value={userName}
-                disabled
-                className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
-              />
-            </div>
+    <div className="w-full h-full bg-gray-100 flex justify-center items-center">
+  <div className="bg-white p-9 rounded-lg shadow-lg w-full max-w-lg flex items-start relative">
+    {/* Profile Image */}
+    <div className="w-1/8 flex justify-center items-center mb-4 absolute right-25 top-5">
+      <img
+        src={profilePic}
+        alt="Profile"
+        className="w-16 h-16 rounded-full object-cover mt-1 border-2 border-gray-300"
+      />
+    </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-semibold">Email</label>
-              <input
-                type="email"
-                value={userEmail}
-                disabled
-                className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            {/* Review Type */}
-            <div>
-              <label className="block text-sm font-semibold">Review Type</label>
-              <select
-                value={reviewType}
-                onChange={(e) => setReviewType(e.target.value)}
-                className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
-              >
-                <option value="Customer Service">Customer Service</option>
-                <option value="Delivery Service">Delivery Service</option>
-                <option value="Online Ordering Experience">Online Ordering Experience</option>
-                <option value="Medication Quality">Medication Quality</option>
-                <option value="Price of Medication">Price of Medication</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            {/* Rating */}
-            <div>
-              <label className="block text-sm font-semibold">Rating (1-5)</label>
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => handleRatingChange(star)}
-                    className={`${rating >= star ? 'text-yellow-500' : 'text-gray-400'} text-xl`}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
-              {ratingError && <p className="text-red-500">{ratingError}</p>}
-            </div>
-
-            {/* Comment */}
-            <div>
-              <label className="block text-sm font-semibold">Comment</label>
-              <textarea
-                value={comment}
-                onChange={handleCommentChange}
-                className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
-                rows="4"
-                placeholder="Write your comment here..."
-                required
-              />
-              {commentError && <p className="text-red-500">{commentError}</p>}
-            </div>
-
-            {/* Would you recommend this? */}
-            <div>
-              <label className="block text-sm font-semibold">Would you recommend this?</label>
-              <div className="flex gap-4">
-                <label>
-                  <input
-                    type="radio"
-                    value="yes"
-                    checked={recommendation === true}
-                    onChange={() => setRecommendation(true)}
-                    className="mr-2"
-                  />
-                  Yes
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="no"
-                    checked={recommendation === false}
-                    onChange={() => setRecommendation(false)}
-                    className="mr-2"
-                  />
-                  No
-                </label>
-              </div>
-            </div>
-
-            {/* Upload Image (optional) */}
-            <div>
-              <label className="block text-sm font-semibold">Upload Image (optional)</label>
-              <input
-                type="file"
-                onChange={handleImageChange}
-                className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            {/* Date */}
-            <div>
-              <label className="block text-sm font-semibold">Date</label>
-              <input
-                type="date"
-                value={currentDate}
-                disabled
-                className="w-full p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-              >
-                Submit Review
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Profile Image */}
-        <div className="w-1/8 flex justify-center items-center ">
-          <img
-            src={profilePic}
-            alt="Profile"
-            className="w-16 h-16 rounded-full object-cover mt-1 border-2 border-gray-300"
+    <div className="w-4/5">
+      <h1 className="text-2xl font-bold mb-4">Add Your Review</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-semibold">Name</label>
+          <input
+            type="text"
+            value={userName}
+            disabled
+            className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
           />
         </div>
-      </div>
+
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-semibold">Email</label>
+          <input
+            type="email"
+            value={userEmail}
+            disabled
+            className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        {/* Review Type */}
+        <div>
+          <label className="block text-sm font-semibold">Review Type</label>
+          <select
+            value={reviewType}
+            onChange={(e) => setReviewType(e.target.value)}
+            className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+          >
+            <option value="Customer Service">Customer Service</option>
+            <option value="Delivery Service">Delivery Service</option>
+            <option value="Online Ordering Experience">Online Ordering Experience</option>
+            <option value="Medication Quality">Medication Quality</option>
+            <option value="Price of Medication">Price of Medication</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Rating */}
+        <div>
+          <label className="block text-sm font-semibold">Rating (1-5)</label>
+          <div className="flex items-center">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => handleRatingChange(star)}
+                className={`${rating >= star ? 'text-yellow-500' : 'text-gray-400'} text-xl`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          {ratingError && <p className="text-red-500">{ratingError}</p>}
+        </div>
+
+        {/* Comment */}
+        <div>
+          <label className="block text-sm font-semibold">Comment</label>
+          <textarea
+            value={comment}
+            onChange={handleCommentChange}
+            className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+            rows="4"
+            placeholder="Write your comment here..."
+            required
+          />
+          {commentError && <p className="text-red-500">{commentError}</p>}
+        </div>
+
+        {/* Would you recommend this? */}
+        <div>
+          <label className="block text-sm font-semibold">Would you recommend this?</label>
+          <div className="flex gap-4">
+            <label>
+              <input
+                type="radio"
+                value="yes"
+                checked={recommendation === true}
+                onChange={() => setRecommendation(true)}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="no"
+                checked={recommendation === false}
+                onChange={() => setRecommendation(false)}
+                className="mr-2"
+              />
+              No
+            </label>
+          </div>
+        </div>
+
+        {/* Upload Image (optional) */}
+        <div>
+          <label className="block text-sm font-semibold">Upload Image (optional)</label>
+          <input
+            type="file"
+            onChange={handleImageChange}
+            className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        {/* Date */}
+        <div>
+          <label className="block text-sm font-semibold">Date</label>
+          <input
+            type="date"
+            value={currentDate}
+            disabled
+            className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-center mt-3">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+          >
+            Submit Review
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
+
   );
 }
 

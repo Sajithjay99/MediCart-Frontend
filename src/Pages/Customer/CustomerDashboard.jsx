@@ -5,7 +5,8 @@ import Customerlogin from '../Customer Login/customerlogin'
 import Review from './Reviews/Review' 
 import AddReview from './Reviews/AddReview'
 import ViewOwnReview from './Reviews/ViewOwnReview'
-import AboutUs from '../../components/AboutUs'
+import UpdateReview from './Reviews/UpdateReview'
+
 
 function CustomerDashboard() {
   return (
@@ -23,10 +24,11 @@ function CustomerDashboard() {
   <Route path="/shop" element={<h1>Shop page</h1>} />
   <Route path="/medicine" element={<h1>Medicine page</h1>} />
   <Route path="/reviews" element={<Review />} />
-  <Route path="/about" element={<AboutUs/>} />
+  <Route path="/about" element={<h1>About</h1>} />
   <Route path="/contactus" element={<h1>Contact page</h1>} />
   <Route path="/add-review" element={<AddReview />} />
   <Route path="/my-review" element={<ViewOwnReview />} />
+  <Route path="/update-review/:id" element={<UpdateReview />} />
   
 </Routes>
 
