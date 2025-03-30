@@ -8,6 +8,10 @@ import { FaUserLarge } from "react-icons/fa6";
 import { RiShoppingCart2Fill } from "react-icons/ri";
 import { Link, Routes, Route } from "react-router-dom";
 import MedicineOrders from "./MedicineOrders";
+import AddAdmin from './users/AddAdminPage';  
+import ManageCustomers from './users/ManageCustomersPage';  
+
+
 
 /** SidebarDropdown Component */
 const SidebarDropdown = ({ title, icon: Icon, links }) => {
@@ -117,10 +121,10 @@ function AdminPage() {
 
           <Route path="/reviews" element={<h1>Reviews</h1>} />
 
-          <Route path="/users/add-admin" element={<h1>Add Admin</h1>} />
-          <Route path="/users/manage-customers" element={<h1>Manage Customers</h1>} />
+          <Route path="/users/add-admin" element={<AddAdmin />} />
+          <Route path="/users/manage-customers" element={<ManageCustomers />} />
 
-          {/* Optional: default route */}
+          
           <Route path="*" element={<h1>Welcome to Admin Panel</h1>} />
         </Routes>
       </div>
