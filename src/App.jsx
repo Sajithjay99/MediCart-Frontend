@@ -18,6 +18,7 @@ function App() {
       <Route path="/customerlogin" element={<Customerlogin />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/*" element={<CustomerDashboard />} />
+      
     </Routes>
   </BrowserRouter>
   

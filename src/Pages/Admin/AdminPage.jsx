@@ -7,8 +7,10 @@ import { AiFillMedicineBox } from "react-icons/ai";
 import { FaUserLarge } from "react-icons/fa6";
 import { RiShoppingCart2Fill } from "react-icons/ri";
 import { Link, Routes, Route } from "react-router-dom";
+import MedicineOrders from "./MedicineOrders";
 import AddAdmin from './users/AddAdminPage';  
 import ManageCustomers from './users/ManageCustomersPage';  
+
 
 
 /** SidebarDropdown Component */
@@ -112,7 +114,7 @@ function AdminPage() {
       <div className="ml-[225px] w-[calc(100%-225px)] h-full overflow-y-auto bg-gray-100 p-6">
         <Routes>
           <Route path="/dashboard" element={<h1>Dashboard</h1>} />
-          <Route path="/medicine" element={<h1>Medicine</h1>} />
+          <Route path="/medicine" element={<MedicineOrders/>} />
 
           <Route path="/products/add" element={<h1>Add Product</h1>} />
           <Route path="/products/manage" element={<h1>Manage Product</h1>} />
