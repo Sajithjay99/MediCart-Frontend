@@ -97,7 +97,7 @@ function UpdateReview() {
         },
       });
       toast.success('Review updated successfully');
-      navigate('/reviews');
+      navigate('/profile/my-review');
     } catch (err) {
       toast.error('Failed to update review');
     }

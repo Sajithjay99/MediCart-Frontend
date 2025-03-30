@@ -66,8 +66,8 @@ function About() {
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
           {[
             { name: 'Sajith Jayasooriya', img: '/team1.jpg' },
-            { name: 'Lasitha Dissanayaka', img: '/team2.jpg' },
-            { name: 'Akash Jayasuriya', img: '/team3.jpg' },
+            { name: 'Lasitha Dissanayaka', img: '/team2.png' },
+            { name: 'Akash Jayasuriya', img: '/team3.png' },
             { name: 'Oshan Wanasekara', img: '/team4.jpg' },
           ].map((member, i) => (
             <div

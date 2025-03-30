@@ -29,7 +29,7 @@ function Review() {
       
       <div className="mb-6">
         <Link to="/add-review">
-          <button className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600">
+          <button className="bg-blue-500/90 text-white px-6 py-2 rounded-md hover:bg-black">
             Create Review
           </button>
         </Link>

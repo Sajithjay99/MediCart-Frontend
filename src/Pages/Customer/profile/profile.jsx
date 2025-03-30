@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast'; 
-import mediaUpload from 'D:/MEDI-CART/MediCart-Frontend/src/utils/mediaupload.jsx'; 
+import mediaUpload from '../../../utils/mediaupload'; 
 
 const Profile = () => {
     const [userData, setUserData] = useState(null);
@@ -136,13 +136,13 @@ const Profile = () => {
                 <div className="flex justify-start mb-6 space-x-4">
                     <button 
                         onClick={() => navigate("/profile/my-orders")} 
-                        className="px-6 py-3 bg-teal-500 text-white rounded-md hover:bg-teal-600"
+                        className="px-6 py-3 bg-blue-500/90 text-white rounded-md hover:bg-black"
                     >
                         My Orders
                     </button>
                     <button 
-                        onClick={() => navigate("/profile/my-reviews")} 
-                        className="px-6 py-3 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+                        onClick={() => navigate("/profile/my-review")} 
+                        className="px-6 py-3 bg-black text-white rounded-md hover:bg-blue-500/90"
                     >
                         My Reviews
                     </button>
@@ -198,7 +198,7 @@ const Profile = () => {
                             />
                             <button 
                                 onClick={handleSaveChanges} 
-                                className="w-1/4 mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-md"
+                                className="w-1/4 mt-4 px-4 py-2 bg-blue-500/90 text-white rounded-md hover:bg-black text-md"
                             >
                                 Save Changes
                             </button>
@@ -244,7 +244,7 @@ const Profile = () => {
             <div className="flex justify-between mt-8 space-x-4">
                 <button 
                     onClick={() => setIsEditing(!isEditing)} 
-                    className="w-1/4 px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-md"
+                    className="w-1/4 px-2 py-1 bg-blue-500/90 text-white rounded-md hover:bg-black text-md"
                 >
                     {isEditing ? "Back" : "Edit Profile"}
                 </button>
