@@ -4,6 +4,7 @@ import './App.css'
 import AdminPage from './Pages/Admin/AdminPage'
 import CustomerDashboard from './Pages/Customer/CustomerDashboard'
 import Customerlogin from './Pages/Customer Login/customerlogin'
+import RegisterPage from './Pages/customer register/CustomerRegister'
 import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -15,7 +16,9 @@ function App() {
     <Routes>
       <Route path="/admin/*" element={<AdminPage />} />
       <Route path="/customerlogin" element={<Customerlogin />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/*" element={<CustomerDashboard />} />
+      
     </Routes>
   </BrowserRouter>
   
