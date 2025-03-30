@@ -7,6 +7,8 @@ import { AiFillMedicineBox } from "react-icons/ai";
 import { FaUserLarge } from "react-icons/fa6";
 import { RiShoppingCart2Fill } from "react-icons/ri";
 import { Link, Routes, Route } from "react-router-dom";
+import ManageProducts from "./Products/ManageProducts";
+import AddProducts from "./Products/AddProducts";
 import MedicineOrders from "./MedicineOrders";
 import AddAdmin from './users/AddAdminPage';  
 import ManageCustomers from './users/ManageCustomersPage';  
@@ -14,6 +16,7 @@ import ManageCustomers from './users/ManageCustomersPage';
 
 
 import ManageReview from "./Reviews/ManageReview";
+
 
 /** SidebarDropdown Component */
 const SidebarDropdown = ({ title, icon: Icon, links }) => {
@@ -118,8 +121,8 @@ function AdminPage() {
           <Route path="/dashboard" element={<h1>Dashboard</h1>} />
           <Route path="/medicine" element={<MedicineOrders/>} />
 
-          <Route path="/products/add" element={<h1>Add Product</h1>} />
-          <Route path="/products/manage" element={<h1>Manage Product</h1>} />
+          <Route path="/products/add" element={<AddProducts/>} />
+          <Route path="/products/manage" element={<ManageProducts/>} />
 
           <Route path="/reviews" element={<ManageReview />} />
 
