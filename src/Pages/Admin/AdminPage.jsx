@@ -9,6 +9,14 @@ import { RiShoppingCart2Fill } from "react-icons/ri";
 import { Link, Routes, Route } from "react-router-dom";
 import ManageProducts from "./Products/ManageProducts";
 import AddProducts from "./Products/AddProducts";
+import MedicineOrders from "./MedicineOrders";
+import AddAdmin from './users/AddAdminPage';  
+import ManageCustomers from './users/ManageCustomersPage';  
+
+
+
+import ManageReview from "./Reviews/ManageReview";
+
 
 /** SidebarDropdown Component */
 const SidebarDropdown = ({ title, icon: Icon, links }) => {
@@ -111,17 +119,17 @@ function AdminPage() {
       <div className="ml-[225px] w-[calc(100%-225px)] h-full overflow-y-auto bg-gray-100 p-6">
         <Routes>
           <Route path="/dashboard" element={<h1>Dashboard</h1>} />
-          <Route path="/medicine" element={<h1>Medicine</h1>} />
+          <Route path="/medicine" element={<MedicineOrders/>} />
 
           <Route path="/products/add" element={<AddProducts/>} />
           <Route path="/products/manage" element={<ManageProducts/>} />
 
-          <Route path="/reviews" element={<h1>Reviews</h1>} />
+          <Route path="/reviews" element={<ManageReview />} />
 
-          <Route path="/users/add-admin" element={<h1>Add Admin</h1>} />
-          <Route path="/users/manage-customers" element={<h1>Manage Customers</h1>} />
+          <Route path="/users/add-admin" element={<AddAdmin />} />
+          <Route path="/users/manage-customers" element={<ManageCustomers />} />
 
-          {/* Optional: default route */}
+          
           <Route path="*" element={<h1>Welcome to Admin Panel</h1>} />
         </Routes>
       </div>
