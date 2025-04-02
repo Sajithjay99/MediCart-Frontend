@@ -10,9 +10,9 @@ function Review() {
   useEffect(() => {
     axios
       .get('http://localhost:5000/api/reviews/getallapprove', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+        // headers: {
+        //   //Authorization: `Bearer ${localStorage.getItem('token')}`,
+        // },
       })
       .then((response) => {
         setReviews(response.data);

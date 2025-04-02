@@ -151,7 +151,7 @@ function UpdateReview() {
             className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
             rows="4"
             placeholder="Write your comment here"
-            required
+            //required
           />
           {commentError && <p className="text-red-500 text-sm">{commentError}</p>}
         </div>

@@ -201,7 +201,7 @@ function AddReview() {
             className="w-[400px] p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
             rows="4"
             placeholder="Write your comment here..."
-            required
+            //required
           />
           {commentError && <p className="text-red-500">{commentError}</p>}
         </div>
