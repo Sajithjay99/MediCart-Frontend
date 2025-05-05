@@ -10,7 +10,7 @@ function MedicineOrders() {
   const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
 
 
   useEffect(() => {
@@ -45,6 +45,7 @@ function MedicineOrders() {
     fetchOrders();
   }, [navigate]);
 
+  //delete
   const handleDelete = async (orderId) => {
     const token = localStorage.getItem("token");
     try {
@@ -56,7 +57,7 @@ function MedicineOrders() {
       console.error("Error deleting order:", err);
     }
   };
-
+//approve orders
   const handleApprove = async (orderId) => {
     const token = localStorage.getItem("token");
     try {
@@ -84,11 +85,35 @@ function MedicineOrders() {
     setIsModalOpen(false);
   };
 
+  const filteredOrders = orders.filter((order) => {
+    const query = searchQuery.toLowerCase();
+    const status = order.isApproved ? "approved" : "pending";
+    return (
+      order.name.toLowerCase().includes(query) ||
+      order.phone.toLowerCase().includes(query) ||
+      order.email.toLowerCase().includes(query) ||
+      status.includes(query)
+    );
+  });
+  
+
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Medicine Orders</h2>
 
+      {/* Search Box and Report Generation Button Container */}
+      <div className="flex justify-between mb-6">
+        {/* Search Box */}
+        <input
+          type="text"
+          placeholder="Search by name, phone,email or status..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-1/2 p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+        />
+      </div>
+      
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 shadow rounded-lg">
           <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
@@ -103,7 +128,7 @@ function MedicineOrders() {
           </thead>
           <tbody>
             {orders.length > 0 ? (
-              orders.map((order, index) => (
+              filteredOrders.map((order, index) => (
                 <tr key={order._id} className="hover:bg-gray-50 transition">
                   <td className="px-4 py-2 border text-center">{index + 1}</td>
                   <td className="px-4 py-2 border text-center">{order.name}</td>
