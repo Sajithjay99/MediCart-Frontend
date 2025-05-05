@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { jsPDF } from 'jspdf';
 
 const API_URL = "http://localhost:5000/api/orders";
 
@@ -85,6 +86,7 @@ function MedicineOrders() {
     setIsModalOpen(false);
   };
 
+  //search function
   const filteredOrders = orders.filter((order) => {
     const query = searchQuery.toLowerCase();
     const status = order.isApproved ? "approved" : "pending";
@@ -96,6 +98,41 @@ function MedicineOrders() {
     );
   });
   
+//genarate report
+const handleGeneratePDF = () => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(15);  
+  doc.text("Orders Report", 14, 10);  
+
+  let yPosition = 20;
+  doc.setFontSize(10);  
+  // Header
+  doc.text("Order No", 14, yPosition);
+  doc.text("Email", 64, yPosition);
+  doc.text("Status", 124, yPosition);
+  doc.text("Order Date", 164, yPosition);
+
+  yPosition += 8;
+
+  // Add the orders
+  filteredOrders.forEach((order, index) => {
+    doc.text(String(index + 1), 14, yPosition); // Serial number
+    doc.text(order.email, 40, yPosition);       // Email
+    doc.text(order.isApproved ? "Approved" : "Pending", 120, yPosition); 
+    doc.text(new Date(order.order_date).toLocaleDateString() || "", 164, yPosition);
+
+    yPosition += 10;
+
+    // Add a page if nearing bottom
+    if (yPosition > 270) {
+      doc.addPage();
+      yPosition = 20;
+    }
+  });
+
+  doc.save("orders_report.pdf");
+};
 
 
   return (
@@ -112,13 +149,20 @@ function MedicineOrders() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-1/2 p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
         />
+        {/* Report Generation Button */}
+        <button
+          onClick={handleGeneratePDF}
+          className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
+        >
+          Generate PDF
+        </button>
       </div>
       
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 shadow rounded-lg">
           <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
             <tr>
-              <th className="px-4 py-3 border">#</th>
+              <th className="px-4 py-3 border">ID</th>
               <th className="px-4 py-3 border">Customer</th>
               <th className="px-4 py-3 border">Email</th>
               <th className="px-4 py-3 border">Phone</th>
