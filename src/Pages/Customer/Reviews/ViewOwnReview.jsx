@@ -120,9 +120,10 @@ function ViewOwnReview() {
         </table>
       </div>
 
+
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 z-5 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirm Deletion</h2>
             <p className="text-gray-600 mb-6">Are you sure you want to delete this review?</p>

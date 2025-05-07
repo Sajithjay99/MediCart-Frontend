@@ -29,11 +29,11 @@ function Review() {
       </div>
 
       {/* Review Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-9 ">
         {reviews.map((review) => (
           <div
             key={review._id}
-            className="group relative  border border-gray-200 rounded-lg shadow-sm p-4 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300 backdrop-blur-xl bg-blue-50"
+            className="group relative  border border-blue-400 rounded-lg shadow-sm p-4 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300 backdrop-blur-xl bg-blue-50"
           >
             {/* Profile image */}
             <div className="flex justify-center -mt-12 mb-2">
@@ -47,12 +47,12 @@ function Review() {
             {/* Name + Email */}
             <div>
               <h3 className="font-semibold text-gray-800 text-base">{review.name}</h3>
-              <p className="text-sm text-gray-500">{review.email}</p>
+              <p className="text-xs text-gray-500">{review.email}</p>
             </div>
 
             {/* Review Type */}
             <div className="mt-1">
-              <span className="inline-block bg-blue-100 text-blue-700 text-sm font-medium px-3 py-0.5 rounded-full">
+              <span className="inline-block bg-blue-100 text-blue-700 text-m font-medium px-3 py-0.5 rounded-full">
                 {review.reviewType}
               </span>
             </div>
@@ -72,7 +72,7 @@ function Review() {
             </div>
 
             {/* Comment */}
-            <p className="text-gray-700 text-sm mt-2 line-clamp-3">{review.comment}</p>
+            <p className="text-gray-700 text-m mt-2 line-clamp-3">{review.comment}</p>
 
             {/* Optional Image */}
             {review.image && (
