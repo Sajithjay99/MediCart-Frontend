@@ -1,97 +1,94 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';  
+import { Link } from 'react-router-dom';
 
 function Review() {
   const [reviews, setReviews] = useState([]);
 
-  // Fetch approved reviews for customers
   useEffect(() => {
     axios
-      .get('http://localhost:5000/api/reviews/getallapprove', {
-        // headers: {
-        //   //Authorization: `Bearer ${localStorage.getItem('token')}`,
-        // },
-      })
+      .get('http://localhost:5000/api/reviews/getallapprove')
       .then((response) => {
         setReviews(response.data);
       })
-      .catch((err) => {
+      .catch(() => {
         toast.error('Failed to fetch reviews');
       });
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Customer Reviews</h1>
-
-      
-      <div className="mb-6">
+    <div className="p-6 max-w-screen-xl mx-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Customer Reviews</h1>
         <Link to="/add-review">
-          <button className="bg-blue-500/90 text-white px-6 py-2 rounded-md hover:bg-black">
+          <button className="bg-blue-600 hover:bg-blue-800 text-white px-5 py-2 rounded-md transition duration-200 shadow">
             Create Review
           </button>
         </Link>
       </div>
 
-      {/* Display Reviews */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Review Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {reviews.map((review) => (
           <div
             key={review._id}
-            className="bg-[#22617c] text-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200"
+            className="group relative  border border-gray-200 rounded-lg shadow-sm p-4 text-center hover:shadow-xl hover:scale-[1.02] transition-all duration-300 backdrop-blur-xl bg-blue-50"
           >
-            
-            <div className="flex items-center mb-4">
-               
+            {/* Profile image */}
+            <div className="flex justify-center -mt-12 mb-2">
               <img
-                src={review.profilePicture}
-                // alt={review.name}
-                className="w-12 h-12 rounded-full object-cover mr-4"
+                src={review.profilePicture || '/default-avatar.png'}
+                alt="Profile"
+                className="w-16 h-16 rounded-full border-2 border-white object-cover shadow"
               />
-              
-              <div>
-                <div>{review.name}</div>
-                <div>{review.email}</div>
-              </div>
             </div>
 
-            
-            <div className="mb-2">{review.reviewType}</div>
-
-            
-            <div className="mb-2">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <span
-                    key={i}
-                    className={`${
-                      i < review.rating ? 'text-yellow-500' : 'text-gray-400'
-                    } text-lg`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
+            {/* Name + Email */}
+            <div>
+              <h3 className="font-semibold text-gray-800 text-base">{review.name}</h3>
+              <p className="text-sm text-gray-500">{review.email}</p>
             </div>
 
-            
-            <div className="mb-2">{review.comment}</div>
+            {/* Review Type */}
+            <div className="mt-1">
+              <span className="inline-block bg-blue-100 text-blue-700 text-sm font-medium px-3 py-0.5 rounded-full">
+                {review.reviewType}
+              </span>
+            </div>
 
-             
+            {/* Stars - centered and animated */}
+            <div className="flex justify-center items-center mt-2 gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <span
+                  key={i}
+                  className={`${
+                    i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                  } text-xl transition-transform duration-200 group-hover:scale-110`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            {/* Comment */}
+            <p className="text-gray-700 text-sm mt-2 line-clamp-3">{review.comment}</p>
+
+            {/* Optional Image */}
             {review.image && (
-              <div className="mb-2">
+              <div className="mt-2">
                 <img
                   src={review.image}
-                  alt="Review Image"
-                  className="w-full h-48 object-cover rounded-lg mt-2"
+                  alt="Review"
+                  className="w-full h-32 object-cover rounded-md border"
                 />
               </div>
             )}
 
-             
-            <div className="mb-2">{new Date(review.date).toLocaleDateString()}</div>
+            {/* Date */}
+            <div className="text-xs text-gray-400 mt-2">
+              {new Date(review.date).toLocaleDateString()}
+            </div>
           </div>
         ))}
       </div>
