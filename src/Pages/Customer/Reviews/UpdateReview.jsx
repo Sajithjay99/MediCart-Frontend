@@ -6,15 +6,17 @@ import mediaUpload from '../../../utils/mediaupload';
 
 function UpdateReview() {
   const { id } = useParams();
-  const [review, setReview] = useState({});
+  const navigate = useNavigate();
+
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(0);
   const [recommendation, setRecommendation] = useState(false);
-  const [image, setImage] = useState(null);
   const [reviewType, setReviewType] = useState('');
+  const [image, setImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+
   const [commentError, setCommentError] = useState('');
   const [ratingError, setRatingError] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,24 +33,23 @@ function UpdateReview() {
 
     axios
       .get(`http://localhost:5000/api/reviews/getOwnOneReview/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        const reviewData = response.data;
-        if (reviewData) {
-          setReview(reviewData);
-          setComment(reviewData.comment || '');
-          setRating(reviewData.rating || 0);
-          setRecommendation(reviewData.recommendation || false);
-          setImage(reviewData.image || null);
-          setReviewType(reviewData.reviewType || '');
+      .then((res) => {
+        const review = res.data.data;
+        if (review) {
+          setComment(review.comment || '');
+          setRating(review.rating || 0);
+          setRecommendation(review.recommendation ?? false);
+          setReviewType(review.reviewType || '');
+          setPreviewImage(review.image || null);
         } else {
           toast.error('Review not found');
           navigate('/reviews');
         }
       })
       .catch(() => {
-        toast.error('Failed to fetch review for updating');
+        toast.error('Failed to fetch review');
       });
   }, [id, navigate]);
 
@@ -56,23 +57,53 @@ function UpdateReview() {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
+      setPreviewImage(URL.createObjectURL(file));
     }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setPreviewImage(null);
+  };
+
+  const handleCommentChange = (e) => {
+    const value = e.target.value;
+    setComment(value);
+    setCommentError(value.length > 100 ? 'Comment cannot exceed 100 characters' : '');
+  };
+
+  const handleRatingChange = (star) => {
+    setRating(star);
+    setRatingError('');
   };
 
   const handleUpdateReview = async (e) => {
     e.preventDefault();
 
+    let hasError = false;
+
     if (rating === 0) {
       setRatingError('Rating is required');
-      return;
+      toast.error('Rating is required');
+      hasError = true;
     }
 
-    if (comment === '') {
+    if (!comment.trim()) {
       setCommentError('Comment is required');
-      return;
+      toast.error('Comment is required');
+      hasError = true;
     }
 
-    let imageUrl = '';
+    if (comment.length > 100) {
+      setCommentError('Comment cannot exceed 100 characters');
+      toast.error('Comment cannot exceed 100 characters');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    let imageUrl = previewImage;
+
     if (image) {
       const uploadResult = await mediaUpload(image);
       if (uploadResult.error) {
@@ -80,6 +111,8 @@ function UpdateReview() {
         return;
       }
       imageUrl = uploadResult.url;
+    } else if (!previewImage) {
+      imageUrl = null;
     }
 
     const updatedReview = {
@@ -87,36 +120,24 @@ function UpdateReview() {
       comment,
       recommendation,
       reviewType,
-      image: imageUrl || review.image,
+      image: imageUrl,
     };
 
     try {
-      await axios.put(`http://localhost:5000/api/reviews/updatebycustomer/${id}`, updatedReview, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      toast.success('Review updated successfully');
+      await axios.put(
+        `http://localhost:5000/api/reviews/updatebycustomer/${id}`,
+        updatedReview,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      toast.success('Review updated successfully!');
       navigate('/profile/my-review');
     } catch (err) {
       toast.error('Failed to update review');
     }
-  };
-
-  const handleCommentChange = (e) => {
-    const newComment = e.target.value;
-    setComment(newComment);
-
-    if (newComment.length > 100) {
-      setCommentError('Comment cannot exceed 100 characters');
-    } else {
-      setCommentError('');
-    }
-  };
-
-  const handleRatingChange = (star) => {
-    setRating(star);
-    setRatingError('');
   };
 
   return (
@@ -125,7 +146,7 @@ function UpdateReview() {
 
       <form onSubmit={handleUpdateReview} className="space-y-6">
         {/* Rating */}
-        <div className="space-y-2">
+        <div>
           <label className="block text-sm font-semibold">Rating (1-5)</label>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -143,7 +164,7 @@ function UpdateReview() {
         </div>
 
         {/* Comment */}
-        <div className="space-y-2">
+        <div>
           <label className="block text-sm font-semibold">Comment</label>
           <textarea
             value={comment}
@@ -151,13 +172,12 @@ function UpdateReview() {
             className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
             rows="4"
             placeholder="Write your comment here"
-            //required
           />
           {commentError && <p className="text-red-500 text-sm">{commentError}</p>}
         </div>
 
         {/* Review Type */}
-        <div className="space-y-2">
+        <div>
           <label className="block text-sm font-semibold">Review Type</label>
           <select
             value={reviewType}
@@ -175,13 +195,12 @@ function UpdateReview() {
         </div>
 
         {/* Recommendation */}
-        <div className="space-y-2">
+        <div>
           <label className="block text-sm font-semibold">Would you recommend this?</label>
           <div className="flex gap-4">
             <label>
               <input
                 type="radio"
-                value="yes"
                 checked={recommendation === true}
                 onChange={() => setRecommendation(true)}
                 className="mr-2"
@@ -191,7 +210,6 @@ function UpdateReview() {
             <label>
               <input
                 type="radio"
-                value="no"
                 checked={recommendation === false}
                 onChange={() => setRecommendation(false)}
                 className="mr-2"
@@ -201,8 +219,8 @@ function UpdateReview() {
           </div>
         </div>
 
-        {/* Image Upload */}
-        <div className="space-y-2">
+        {/* Upload New Image */}
+        <div>
           <label className="block text-sm font-semibold">Upload Image (optional)</label>
           <input
             type="file"
@@ -211,20 +229,27 @@ function UpdateReview() {
           />
         </div>
 
-        {/* Display the image if available */}
-        {image && (
-          <div className="mt-4">
-            <p>Selected Image:</p>
+        {/* Image Preview with Red Cross */}
+        {previewImage && (
+          <div className="relative inline-block mt-4">
             <img
-              src={URL.createObjectURL(image)}
-              alt="Selected Review Image"
-              className="w-32 h-32 object-cover mt-2"
+              src={previewImage}
+              alt="Review"
+              className="w-32 h-32 object-cover rounded-md border"
             />
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="absolute top-[-8px] right-[-8px] bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700 shadow"
+              title="Remove Image"
+            >
+              ×
+            </button>
           </div>
         )}
 
-        {/* Submit Button */}
-        <div className="flex justify-end">
+        {/* Submit */}
+        <div className="flex justify-end mt-6">
           <button
             type="submit"
             className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
