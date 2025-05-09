@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { jsPDF } from 'jspdf';
 
 const API_URL = "http://localhost:5000/api/orders";
 
@@ -10,7 +11,7 @@ function MedicineOrders() {
   const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
 
 
   useEffect(() => {
@@ -45,6 +46,7 @@ function MedicineOrders() {
     fetchOrders();
   }, [navigate]);
 
+  //delete
   const handleDelete = async (orderId) => {
     const token = localStorage.getItem("token");
     try {
@@ -56,7 +58,7 @@ function MedicineOrders() {
       console.error("Error deleting order:", err);
     }
   };
-
+//approve orders
   const handleApprove = async (orderId) => {
     const token = localStorage.getItem("token");
     try {
@@ -84,16 +86,83 @@ function MedicineOrders() {
     setIsModalOpen(false);
   };
 
+  //search function
+  const filteredOrders = orders.filter((order) => {
+    const query = searchQuery.toLowerCase();
+    const status = order.isApproved ? "approved" : "pending";
+    return (
+      order.name.toLowerCase().includes(query) ||
+      order.phone.toLowerCase().includes(query) ||
+      order.email.toLowerCase().includes(query) ||
+      status.includes(query)
+    );
+  });
+  
+//genarate report
+const handleGeneratePDF = () => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(15);  
+  doc.text("Orders Report", 14, 10);  
+
+  let yPosition = 20;
+  doc.setFontSize(10);  
+  // Header
+  doc.text("Order No", 14, yPosition);
+  doc.text("Email", 64, yPosition);
+  doc.text("Status", 124, yPosition);
+  doc.text("Order Date", 164, yPosition);
+
+  yPosition += 8;
+
+  // Add the orders
+  filteredOrders.forEach((order, index) => {
+    doc.text(String(index + 1), 14, yPosition); // Serial number
+    doc.text(order.email, 40, yPosition);       // Email
+    doc.text(order.isApproved ? "Approved" : "Pending", 120, yPosition); 
+    doc.text(new Date(order.order_date).toLocaleDateString() || "", 164, yPosition);
+
+    yPosition += 10;
+
+    // Add a page if nearing bottom
+    if (yPosition > 270) {
+      doc.addPage();
+      yPosition = 20;
+    }
+  });
+
+  doc.save("orders_report.pdf");
+};
+
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Medicine Orders</h2>
 
+      {/* Search Box and Report Generation Button Container */}
+      <div className="flex justify-between mb-6">
+        {/* Search Box */}
+        <input
+          type="text"
+          placeholder="Search by name, phone,email or status..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-1/2 p-2 mt-1 bg-gray-100 border border-gray-300 rounded-md"
+        />
+        {/* Report Generation Button */}
+        <button
+          onClick={handleGeneratePDF}
+          className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
+        >
+          Generate PDF
+        </button>
+      </div>
+      
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 shadow rounded-lg">
           <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
             <tr>
-              <th className="px-4 py-3 border">#</th>
+              <th className="px-4 py-3 border">ID</th>
               <th className="px-4 py-3 border">Customer</th>
               <th className="px-4 py-3 border">Email</th>
               <th className="px-4 py-3 border">Phone</th>
@@ -103,7 +172,7 @@ function MedicineOrders() {
           </thead>
           <tbody>
             {orders.length > 0 ? (
-              orders.map((order, index) => (
+              filteredOrders.map((order, index) => (
                 <tr key={order._id} className="hover:bg-gray-50 transition">
                   <td className="px-4 py-2 border text-center">{index + 1}</td>
                   <td className="px-4 py-2 border text-center">{order.name}</td>
