@@ -9,14 +9,14 @@ const AddAdmin = () => {
     email: '',
     password: '',
     phone: '',
-    role: 'admin',  
+    role: 'admin',
   });
 
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const token = localStorage.getItem('token');  
+  const token = localStorage.getItem('token');
 
-  
+  // Reset form when component mounts
   useEffect(() => {
     setFormData({
       firstname: '',
@@ -55,14 +55,14 @@ const AddAdmin = () => {
       return;
     }
 
-    // Validate password (minimum 6 characters)
+    // Validate password
     if (password.length < 6) {
       setError('Password must be at least 6 characters long.');
       toast.error('Password must be at least 6 characters long.');
       return;
     }
 
-    // Validate phone number (only numbers, minimum 10 digits)
+    // Validate phone number 
     const phonePattern = /^[0-9]{10}$/;
     if (!phonePattern.test(phone)) {
       setError('Please enter a valid 10-digit phone number.');
@@ -71,11 +71,14 @@ const AddAdmin = () => {
     }
 
     try {
-      
       const response = await axios.post(
-        'http://localhost:5000/api/users/register',  
-        formData
-        
+        'http://localhost:5000/api/users/register',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach the token for authorization
+          },
+        }
       );
 
       setSuccessMessage('Admin added successfully!');
@@ -91,6 +94,7 @@ const AddAdmin = () => {
     } catch (err) {
       setError('Error adding admin. Please try again.');
       toast.error('Error adding admin. Please try again.');
+      console.error("Error:", err.response ? err.response.data : err.message);
     }
   };
 
@@ -98,12 +102,12 @@ const AddAdmin = () => {
     <div className="p-8 max-w-lg mx-auto bg-white rounded-lg shadow-md">
       <h2 className="text-3xl font-semibold text-center mb-6">Add New Admin</h2>
 
-      
+      {/* Display error or success message */}
       {error && <p className="text-red-500 text-center mb-4">{error}</p>}
       {successMessage && <p className="text-green-500 text-center mb-4">{successMessage}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        
+        {/* First Name */}
         <div className="flex flex-col">
           <label htmlFor="firstname" className="text-lg font-medium text-gray-700 mb-2 text-left">First Name</label>
           <input
@@ -117,7 +121,7 @@ const AddAdmin = () => {
           />
         </div>
 
-       
+        {/* Last Name */}
         <div className="flex flex-col">
           <label htmlFor="lastname" className="text-lg font-medium text-gray-700 mb-2 text-left">Last Name</label>
           <input
@@ -131,7 +135,7 @@ const AddAdmin = () => {
           />
         </div>
 
-        
+        {/* Email */}
         <div className="flex flex-col">
           <label htmlFor="email" className="text-lg font-medium text-gray-700 mb-2 text-left">Email</label>
           <input
@@ -145,7 +149,7 @@ const AddAdmin = () => {
           />
         </div>
 
-        
+        {/* Password */}
         <div className="flex flex-col">
           <label htmlFor="password" className="text-lg font-medium text-gray-700 mb-2 text-left">Password</label>
           <input
@@ -159,7 +163,7 @@ const AddAdmin = () => {
           />
         </div>
 
-        
+        {/* Phone */}
         <div className="flex flex-col">
           <label htmlFor="phone" className="text-lg font-medium text-gray-700 mb-2 text-left">Phone</label>
           <input
@@ -173,7 +177,7 @@ const AddAdmin = () => {
           />
         </div>
 
-        
+        {/* Role */}
         <div className="flex flex-col">
           <label htmlFor="role" className="text-lg font-medium text-gray-700 mb-2 text-left">Role</label>
           <select
@@ -187,7 +191,7 @@ const AddAdmin = () => {
           </select>
         </div>
 
-        
+        {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"

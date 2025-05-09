@@ -4,96 +4,94 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { toast } from 'react-hot-toast';
 
-const URL = "http://localhost:5000/api/users/all"; 
+const URL = "http://localhost:5000/api/users/all";
 
 function ManageCustomersPage() {
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
-    const token = localStorage.getItem("token"); 
+    const token = localStorage.getItem("token");
 
-    // Fetch users on page load
+    // ✅ PDF print handler
+    const handlePrint = () => {
+        const printContents = document.getElementById("printable-area").innerHTML;
+        const originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        window.location.reload(); // Reload to restore app after print
+    };
+
+    // 🔄 Fetch users on page load
     useEffect(() => {
         if (!token) {
-            console.error("No token found, redirecting to login.");
-            navigate("/login", { replace: true }); 
+            navigate("/login", { replace: true });
             return;
         }
 
         try {
-            const decoded = jwtDecode(token); 
+            const decoded = jwtDecode(token);
             if (decoded.role !== "admin") {
-                console.error("Unauthorized access, redirecting to home.");
-                navigate("/", { replace: true }); 
+                navigate("/", { replace: true });
                 return;
             }
         } catch (error) {
-            console.error("Invalid token, redirecting to login.");
-            navigate("/login", { replace: true }); 
+            navigate("/login", { replace: true });
             return;
         }
 
         const fetchUsers = async () => {
-            setLoading(true); 
+            setLoading(true);
             try {
                 const response = await axios.get(URL, {
-                    headers: { Authorization: `Bearer ${token}` },  
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
-                setUsers(response.data || []);  
-                setFilteredUsers(response.data || []); 
+                setUsers(response.data || []);
+                setFilteredUsers(response.data || []);
             } catch (err) {
-                console.error("Error fetching users:", err);
-                setError("Error fetching users");  
-                toast.error("Error fetching users");  
+                setError("Error fetching users");
+                toast.error("Error fetching users");
             } finally {
-                setLoading(false); 
+                setLoading(false);
             }
         };
 
         fetchUsers();
-    }, [navigate, token]);  
+    }, [navigate, token]);
 
-    
+    // 🗑 Delete user
     const handleDelete = async (userId) => {
-        const isConfirmed = window.confirm('Are you sure you want to delete this user?');  
-        if (!isConfirmed) {
-            return;  
-        }
+        const isConfirmed = window.confirm('Are you sure you want to delete this user?');
+        if (!isConfirmed) return;
 
         try {
             const response = await axios.delete(
                 `http://localhost:5000/api/users/delete-user/${userId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
-            setSuccessMessage(response.data.message); 
-            setUsers(users.filter((user) => user._id !== userId)); 
-            toast.success("User deleted successfully!");  
+            setSuccessMessage(response.data.message);
+            setUsers(users.filter((user) => user._id !== userId));
+            setFilteredUsers(filteredUsers.filter((user) => user._id !== userId));
+            toast.success("User deleted successfully!");
         } catch (err) {
-            console.error("Error deleting user:", err); 
-            setError("Error deleting user");  I
-            toast.error("Error deleting user");  
+            setError("Error deleting user");
+            toast.error("Error deleting user");
         }
     };
 
-    
+    // 🔍 Search handler
     const handleSearchChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
-        
         if (query === '') {
-            setFilteredUsers(users); 
+            setFilteredUsers(users);
         } else {
-            
-            const filtered = users.filter(user => 
+            const filtered = users.filter(user =>
                 user.firstname.toLowerCase().includes(query.toLowerCase()) ||
                 user.lastname.toLowerCase().includes(query.toLowerCase()) ||
                 user.email.toLowerCase().includes(query.toLowerCase()) ||
@@ -109,7 +107,7 @@ function ManageCustomersPage() {
                 Manage Customers
             </h1>
 
-            
+            {/*  Search Input */}
             <div className="mb-6 max-w-lg mx-auto">
                 <input
                     type="text"
@@ -120,11 +118,21 @@ function ManageCustomersPage() {
                 />
             </div>
 
-            
+            {/*  Print Button */}
+            <div className="text-right mb-4">
+                <button
+                    onClick={handlePrint}
+                    className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-150"
+                >
+                    Generate PDF
+                </button>
+            </div>
+
+            {/*  Errors and Messages */}
             {error && <p className="text-red-500 text-center mb-4">{error}</p>}
             {successMessage && <p className="text-green-500 text-center mb-4">{successMessage}</p>}
 
-            
+            {/*  Customer Table */}
             {loading ? (
                 <div className="text-center text-lg text-blue-500">Loading customers...</div>
             ) : (
@@ -168,6 +176,31 @@ function ManageCustomersPage() {
                     </table>
                 </div>
             )}
+
+            {/*  Hidden Printable Table */}
+            <div id="printable-area" style={{ display: 'none' }}>
+                <h2 style={{ textAlign: 'center', margin: '10px 0' }}>Customer Details</h2>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }} border="1">
+                    <thead>
+                        <tr>
+                            <th style={{ padding: '8px' }}>Name</th>
+                            <th style={{ padding: '8px' }}>Email</th>
+                            <th style={{ padding: '8px' }}>Phone</th>
+                            <th style={{ padding: '8px' }}>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredUsers.map(user => (
+                            <tr key={user._id}>
+                                <td style={{ padding: '8px' }}>{user.firstname} {user.lastname}</td>
+                                <td style={{ padding: '8px' }}>{user.email}</td>
+                                <td style={{ padding: '8px' }}>{user.phone}</td>
+                                <td style={{ padding: '8px' }}>{user.role}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
