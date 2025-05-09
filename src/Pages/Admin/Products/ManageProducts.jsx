@@ -3,6 +3,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import mediaUpload from '../../../utils/mediaupload';
+import ProductPDFGenerator from './ProductPDFGenerator';
+
 
 function ManageProducts() {
   const [products, setProducts] = useState([]);
@@ -98,7 +100,8 @@ function ManageProducts() {
                 <td className="py-2 px-4 border-b">{prod.brand}</td>
                 <td className="py-2 px-4 border-b">{prod.category}</td>
                 <td className="py-2 px-4 border-b">Rs.{prod.price}</td>
-                <td className="py-2 px-4 border-b space-x-2">
+                <td className="py-2 px-4 border-b"><div className="flex flex-wrap gap-2">
+
                   <button
                     className="bg-blue-500/90 text-white px-3 py-1 rounded hover:bg-black"
                     onClick={() => {
@@ -123,6 +126,9 @@ function ManageProducts() {
                   >
                     Delete
                   </button>
+                  {/* ✅ PDF Button */}
+  <ProductPDFGenerator product={prod} />
+  </div>
                 </td>
               </tr>
             ))}
